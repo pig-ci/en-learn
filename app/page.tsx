@@ -208,7 +208,7 @@ const level = currentStats.currentLevel || "A2";
 const topic = pickTopic(level);
 
 // ✨ 重點：這裡傳入 currentStats，而不是那個可能會是 null 的 stats
-const weak = weakSkill(currentStats); 
+const weak = weakSkill(currentStats as any); 
 const isFirst = currentStats.totalArticles === 0;
 
     try {
