@@ -1,0 +1,31 @@
+// app/layout.tsx
+import type { Metadata, Viewport } from 'next';
+import './global.css'; // 💡 引入你改名後的 global.css
+
+// 💡 根據新版 Next.js 規範，將 viewport 獨立導出，解決 500/警告問題
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+};
+
+// 💡 網站基本 Meta 設定
+export const metadata: Metadata = {
+  title: 'English Reading Practice',
+  description: 'Read interesting articles, answer questions, and get better every time.',
+};
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <html lang="zh-TW" suppressHydrationWarning>
+      <head>
+      </head>
+      <body suppressHydrationWarning>
+        {children}
+      </body>
+    </html>
+  );
+}
