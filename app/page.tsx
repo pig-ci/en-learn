@@ -401,7 +401,7 @@ const isFirst = currentStats.totalArticles === 0;
               })}
             </div>
 
-            <button className="btn-start" onClick={startReading}>
+            <button className="btn-start" onClick={startReading} aria-label={stats.totalArticles === 0 ? "開始第一篇文章" : "閱讀下一篇文章"}>
               {stats.totalArticles === 0
                 ? "Start First Article →"
                 : "Next Article →"}
@@ -466,6 +466,7 @@ const isFirst = currentStats.totalArticles === 0;
                           key={oIdx}
                           onClick={() => pickOption(qIdx, oIdx)}
                           disabled={submitted}
+                          aria-label={`第 ${qIdx+1} 題，選項 ${lbl}：${txt}`}
                         >
                           <span className="opt-label">{lbl}</span>
                           <span>{txt}</span>
@@ -497,6 +498,7 @@ const isFirst = currentStats.totalArticles === 0;
                     disabled={
                       Object.keys(answers).length < article.questions.length
                     }
+                    aria-label="提交閱讀測驗答案"
                   >
                     Submit Answers
                   </button>
@@ -517,12 +519,13 @@ const isFirst = currentStats.totalArticles === 0;
                     justifyContent: "center",
                   }}
                 >
-                  <button className="btn-next" onClick={startReading}>
+                  <button className="btn-next" onClick={startReading} aria-label="繼續閱讀下一篇文章">
                     Next Article →
                   </button>
                   <button
                     className="btn-back2"
                     onClick={() => setScreen("dashboard")}
+                    aria-label="返回儀表板首頁"
                   >
                     Home
                   </button>
