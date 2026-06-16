@@ -101,7 +101,7 @@ const TOPICS_BY_LEVEL: Record<string, string[]> = {
 export default function Home() {
   // ── 3. 狀態管理 ──
   const [screen, setScreen] = useState<"dashboard" | "reading">("dashboard");
-  const [stats, setStats] = useState<UserStats | null>(null);
+  const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState({
     show: true,
     text: "載入中...",
