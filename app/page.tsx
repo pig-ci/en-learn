@@ -197,11 +197,14 @@ export default function Home() {
       text: "正在為您生成專屬文章...",
       sub: "這需要幾秒鐘的時間",
     });
-    // @ts-ignore
-    const level = stats.currentLevel || "A2";
-    const topic = pickTopic(level);
-    const weak = weakSkill(stats!);
-    const isFirst = stats.totalArticles === 0;
+// 修改後
+// 💡 直接從 stats 抓出你需要的值，如果 stats 是 null 就設定一個預設值
+const currentStats = stats ?? { totalArticles: 0, currentLevel: "A2" }; 
+
+const level = currentStats.currentLevel || "A2";
+const topic = pickTopic(level);
+const weak = weakSkill(stats); // 這裡不用驚嘆號，TypeScript 會更聽話
+const isFirst = currentStats.totalArticles === 0;
 
     try {
       const res = await fetch("/generate", {
