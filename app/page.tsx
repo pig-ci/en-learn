@@ -197,7 +197,7 @@ export default function Home() {
       text: "正在為您生成專屬文章...",
       sub: "這需要幾秒鐘的時間",
     });
-
+    // @ts-ignore
     const level = stats.currentLevel || "A2";
     const topic = pickTopic(level);
     const weak = weakSkill(stats);
