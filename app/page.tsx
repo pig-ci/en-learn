@@ -200,7 +200,7 @@ export default function Home() {
     // @ts-ignore
     const level = stats.currentLevel || "A2";
     const topic = pickTopic(level);
-    const weak = weakSkill(stats);
+    const weak = weakSkill(stats!);
     const isFirst = stats.totalArticles === 0;
 
     try {
