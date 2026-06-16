@@ -197,13 +197,18 @@ export default function Home() {
       text: "正在為您生成專屬文章...",
       sub: "這需要幾秒鐘的時間",
     });
-// 修改後
-// 💡 直接從 stats 抓出你需要的值，如果 stats 是 null 就設定一個預設值
-const currentStats = stats ?? { totalArticles: 0, currentLevel: "A2" }; 
+// 💡 使用這段邏輯，完全避開 TypeScript 的檢測地雷
+const currentStats = stats ?? { 
+  totalArticles: 0, 
+  currentLevel: "A2",
+  skillScores: { main: { c: 0, t: 0 }, detail: { c: 0, t: 0 }, inference: { c: 0, t: 0 }, vocabulary: { c: 0, t: 0 } }
+}; 
 
 const level = currentStats.currentLevel || "A2";
 const topic = pickTopic(level);
-const weak = weakSkill(stats); // 這裡不用驚嘆號，TypeScript 會更聽話
+
+// ✨ 重點：這裡傳入 currentStats，而不是那個可能會是 null 的 stats
+const weak = weakSkill(currentStats); 
 const isFirst = currentStats.totalArticles === 0;
 
     try {
