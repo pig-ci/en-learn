@@ -42,7 +42,35 @@ function safeParseJSON(text: string): any {
     } catch (secondError: any) {
       console.error('【清理後仍無法解析】:', clean.substring(0, 500));
       console.error('【錯誤資訊】:', secondError.message);
-      throw new Error(`JSON 解析失敗: ${secondError.message}`);
+      
+      // 🔥 5. 如果還是失敗，嘗試修復截斷的 JSON
+      try {
+        console.log('【嘗試修復截斷的 JSON】');
+        // 檢查是否因為截斷導致不完整
+        let fixed = clean;
+        
+        // 如果結尾沒有閉合，嘗試補上
+        const openBraces = (fixed.match(/{/g) || []).length;
+        const closeBraces = (fixed.match(/}/g) || []).length;
+        const openBrackets = (fixed.match(/\[/g) || []).length;
+        const closeBrackets = (fixed.match(/\]/g) || []).length;
+        
+        // 補上缺失的閉合符號
+        for (let i = 0; i < openBraces - closeBraces; i++) {
+          fixed += '}';
+        }
+        for (let i = 0; i < openBrackets - closeBrackets; i++) {
+          fixed += ']';
+        }
+        
+        // 移除尾隨逗號
+        fixed = fixed.replace(/,\s*$/, '');
+        
+        return JSON.parse(fixed);
+      } catch (thirdError: any) {
+        console.error('【修復截斷仍失敗】:', thirdError.message);
+        throw new Error(`JSON 解析失敗: ${secondError.message}`);
+      }
     }
   }
 }
@@ -54,11 +82,11 @@ export async function POST(request: Request) {
 
     // 呼叫 Gemini API
     const response = await ai.models.generateContent({
-      model: 'gemini-3.1-flash-lite-preview',
+      model: 'gemini-2.5-flash',
       contents: prompt,
       config: {
         responseMimeType: "application/json",
-        maxOutputTokens: 2048, // 確保完整輸出
+        maxOutputTokens: 4096, // 🔥 增加到 4096 確保完整輸出
       }
     });
 
@@ -70,6 +98,7 @@ export async function POST(request: Request) {
     // 💡 記錄原始回應（方便除錯）
     console.log('【Gemini 原始回應長度】:', text.length);
     console.log('【Gemini 原始回應（前 200 字）】:', text.substring(0, 200));
+    console.log('【Gemini 原始回應（最後 100 字）】:', text.substring(Math.max(0, text.length - 100)));
 
     // 💡 使用安全解析函式
     const articleData = safeParseJSON(text);
@@ -100,11 +129,11 @@ export async function POST(request: Request) {
 // ── 💡 完美的會考英閱 Prompt 產生器 ──
 function buildPrompt(level: string, topic: string, weak: string | null, isFirst: boolean): string {
   const levelGuides: Record<string, { words: string; sentences: string; vocab: string }> = {
-    A1: { words: '100-130', sentences: 'Very short and simple sentences.', vocab: 'Basic CEFR A1 vocabulary.' },
-    A2: { words: '140-170', sentences: 'Short, clear sentences.', vocab: 'CEFR A2 vocabulary.' },
-    'B1': { words: '180-230', sentences: 'Medium-length sentences.', vocab: 'CEFR B1 vocabulary.' },
-    'B1+': { words: '220-260', sentences: 'Longer sentences with varied structures.', vocab: 'CEFR B1-B2 vocabulary.' },
-    B2: { words: '250-290', sentences: 'Complex sentences.', vocab: 'CEFR B2 vocabulary.' }
+    A1: { words: '80-100', sentences: 'Very short and simple sentences.', vocab: 'Basic CEFR A1 vocabulary.' },
+    A2: { words: '100-130', sentences: 'Short, clear sentences.', vocab: 'CEFR A2 vocabulary.' },
+    'B1': { words: '130-160', sentences: 'Medium-length sentences.', vocab: 'CEFR B1 vocabulary.' },
+    'B1+': { words: '160-190', sentences: 'Longer sentences with varied structures.', vocab: 'CEFR B1-B2 vocabulary.' },
+    B2: { words: '190-220', sentences: 'Complex sentences.', vocab: 'CEFR B2 vocabulary.' }
   };
 
   const g = levelGuides[level] || levelGuides['A2'];
@@ -117,10 +146,10 @@ Topic: ${topic}
 ${firstNote}
 
 === ARTICLE REQUIREMENTS ===
-- Length: ${g.words} words
+- Length: ${g.words} words (be concise and precise)
 - Sentences: ${g.sentences}
 - Vocabulary: ${g.vocab}
-- The article must be INTERESTING. Write 3-4 paragraphs.
+- The article must be INTERESTING and ENGAGING. Write 3-4 short paragraphs.
 ${level === 'B1' || level === 'B1+' || level === 'B2' ? '- Underline ONE challenging vocabulary word using <u> tags.' : ''}
 
 === QUESTION REQUIREMENTS ===
@@ -134,13 +163,15 @@ ${weakNote}
 Each question must have 4 options labeled A/B/C/D, one correct answer index (0-3), and a 1-2 sentence Chinese explanation (解析).
 
 === OUTPUT FORMAT ===
-Respond ONLY with valid JSON. No markdown fences, no extra text before or after. The response must start with { and end with }.
+IMPORTANT: Respond ONLY with valid JSON. No markdown fences, no extra text before or after. 
+The response must start with { and end with }.
+Keep the body text CONCISE to avoid truncation.
 
 Example format:
 {
   "title": "...",
   "topic": "...",
-  "body": "paragraph1\\n\\nparagraph2",
+  "body": "paragraph1\\n\\nparagraph2\\n\\nparagraph3",
   "questions": [
     {
       "type": "main",
