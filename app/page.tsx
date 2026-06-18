@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-
+import ThemeToggle from "./components/ThemeToggle";
 // ── 1. 定義 TypeScript 型別 ──
 interface SkillScore {
   c: number;
@@ -317,6 +317,7 @@ const isFirst = currentStats.totalArticles === 0;
           <div className="nav-logo">
             English <span>Reading Practice</span>
           </div>
+          <ThemeToggle />
         </div>
       </nav>
 

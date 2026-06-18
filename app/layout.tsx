@@ -2,14 +2,13 @@
 import type { Metadata, Viewport } from 'next';
 import './style.css';
 import './dark-style.css';
+import { ThemeProvider } from './context/ThemeContext';
 
-// 💡 根據新版 Next.js 規範，將 viewport 獨立導出，解決 500/警告問題
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
 };
 
-// 💡 網站基本 Meta 設定
 export const metadata: Metadata = {
   title: 'English Reading Practice',
   description: 'Read interesting articles, answer questions, and get better every time.',
@@ -23,9 +22,27 @@ export default function RootLayout({
   return (
     <html lang="zh-TW" suppressHydrationWarning>
       <head>
+        {/* 防止閃爍：在頁面載入前套用主題 */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  const theme = localStorage.getItem('theme');
+                  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                  if (theme === 'dark' || (!theme && prefersDark)) {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                  }
+                } catch (e) {}
+              })();
+            `,
+          }}
+        />
       </head>
       <body suppressHydrationWarning>
-        {children}
+        <ThemeProvider>
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

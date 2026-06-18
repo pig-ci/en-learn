@@ -168,3 +168,12 @@
 [data-theme="dark"] .stat-sub {
   color: var(--color-text-light);
 }
+/* 暗色模式下的調整 */
+[data-theme="dark"] .theme-toggle {
+  color: var(--color-text-secondary);
+}
+
+[data-theme="dark"] .theme-toggle:hover {
+  background: var(--color-border);
+  color: var(--color-text);
+}

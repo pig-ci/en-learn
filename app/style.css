@@ -124,6 +124,7 @@ nav {
   padding: 0 var(--spacing-6);
 }
 
+/* global.css 中的導航列區塊 */
 .nav-inner {
   max-width: var(--max-width);
   margin: 0 auto;
@@ -131,6 +132,12 @@ nav {
   align-items: center;
   justify-content: space-between;
   height: var(--nav-height);
+}
+
+.nav-left {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-4);
 }
 
 .nav-logo {
@@ -141,6 +148,12 @@ nav {
 
 .nav-logo span {
   color: var(--color-primary);
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
 }
 
 /* ============================================
@@ -712,6 +725,36 @@ main {
   color: #aaa;
 }
 
+/* ============================================
+   主題切換按鈕
+   ============================================ */
+.theme-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: var(--spacing-2);
+  border-radius: var(--radius-md);
+  color: var(--color-text-secondary);
+  transition: background var(--transition-fast), color var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+}
+
+.theme-toggle:hover {
+  background: var(--color-border-light);
+  color: var(--color-text);
+}
+
+.theme-toggle svg {
+  transition: transform var(--transition-base);
+}
+
+.theme-toggle:hover svg {
+  transform: rotate(15deg) scale(1.1);
+}
 /* ============================================
    響應式設計
    ============================================ */
