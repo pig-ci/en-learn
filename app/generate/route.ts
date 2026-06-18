@@ -14,7 +14,7 @@ export async function POST(request: Request) {
 
     // 呼叫 Gemini API
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash', // 速度快、極度適合生成短文與選擇題
+      model: 'gemini-3.1-flash-lite-preview', // 速度快、極度適合生成短文與選擇題
       contents: prompt,
       config: {
         responseMimeType: "application/json", // 強制要求 Gemini 回傳 JSON 格式
