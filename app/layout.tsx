@@ -1,5 +1,6 @@
 // app/layout.tsx
 import type { Metadata, Viewport } from 'next';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 import './style.css';
 import './dark-style.css';
 
@@ -26,6 +27,7 @@ export default function RootLayout({
       </head>
       <body suppressHydrationWarning>
         {children}
+        <SpeedInsights />
       </body>
     </html>
   );
