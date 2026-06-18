@@ -1,0 +1,170 @@
+/* ============================================
+   暗色模式 (Dark Mode)
+   ============================================ */
+[data-theme="dark"] {
+  /* 顏色系統 - 暗色版 */
+  --color-primary: #4A9EFF;
+  --color-primary-hover: #6DB0FF;
+  --color-primary-light: #1A3A5A;
+  --color-primary-disabled: #2A4A6A;
+  
+  --color-success: #4ADE80;
+  --color-success-light: #1A3A2A;
+  --color-warning: #FBBF24;
+  --color-danger: #F87171;
+  --color-danger-light: #3A1A1A;
+  
+  --color-text: #E5E7EB;
+  --color-text-secondary: #9CA3AF;
+  --color-text-light: #6B7280;
+  --color-text-white: #F9FAFB;
+  
+  --color-bg: #111827;
+  --color-bg-white: #1F2937;
+  --color-border: #374151;
+  --color-border-light: #2D3748;
+  
+  /* 載入覆蓋層調整 */
+  --loading-overlay-opacity: 0.92;
+}
+
+/* 暗色模式下的額外調整 */
+[data-theme="dark"] .questions-card h3 {
+  color: #9CA3AF;
+}
+
+[data-theme="dark"] .q-type-badge {
+  background: #374151;
+  color: #9CA3AF;
+}
+
+[data-theme="dark"] .error-box {
+  border-color: #7F1D1D;
+}
+
+[data-theme="dark"] .btn-back2 {
+  background: var(--color-bg-white);
+  border-color: var(--color-border);
+  color: var(--color-text-secondary);
+}
+
+[data-theme="dark"] .btn-back2:hover {
+  background: #374151;
+}
+
+[data-theme="dark"] .level-icon {
+  background: #1A3A5A;
+}
+
+[data-theme="dark"] .loading-overlay {
+  background: rgba(17, 24, 39, 0.94);
+}
+
+[data-theme="dark"] .spinner {
+  border-color: #1A3A5A;
+  border-top-color: var(--color-primary);
+}
+
+[data-theme="dark"] .stat-card,
+[data-theme="dark"] .level-card,
+[data-theme="dark"] .skill-section,
+[data-theme="dark"] .article-card,
+[data-theme="dark"] .questions-card,
+[data-theme="dark"] .result-card {
+  border-color: var(--color-border);
+}
+
+[data-theme="dark"] .opt-btn {
+  border-color: var(--color-border);
+  background: var(--color-bg-white);
+  color: var(--color-text);
+}
+
+[data-theme="dark"] .opt-btn:hover:not(:disabled) {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+}
+
+[data-theme="dark"] .opt-btn.selected {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+}
+
+[data-theme="dark"] .opt-btn.correct {
+  border-color: var(--color-success);
+  background: var(--color-success-light);
+  color: var(--color-success);
+}
+
+[data-theme="dark"] .opt-btn.wrong {
+  border-color: var(--color-danger);
+  background: var(--color-danger-light);
+  color: #FCA5A5;
+}
+
+[data-theme="dark"] .opt-label {
+  color: var(--color-primary);
+}
+
+[data-theme="dark"] .opt-btn.selected .opt-label {
+  color: var(--color-primary);
+}
+
+[data-theme="dark"] .opt-btn.correct .opt-label {
+  color: var(--color-success);
+}
+
+[data-theme="dark"] .opt-btn.wrong .opt-label {
+  color: var(--color-danger);
+}
+
+[data-theme="dark"] .q-exp.ok {
+  background: var(--color-success-light);
+  border-left-color: var(--color-success);
+  color: var(--color-success);
+}
+
+[data-theme="dark"] .q-exp.no {
+  background: var(--color-danger-light);
+  border-left-color: var(--color-danger);
+  color: #FCA5A5;
+}
+
+[data-theme="dark"] .skill-bar {
+  background: var(--color-border-light);
+}
+
+[data-theme="dark"] .tag-topic {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+}
+
+[data-theme="dark"] .tag-level {
+  background: var(--color-success-light);
+  color: var(--color-success);
+}
+
+[data-theme="dark"] .article-body {
+  color: var(--color-text-secondary);
+}
+
+[data-theme="dark"] .q-text {
+  color: var(--color-text);
+}
+
+[data-theme="dark"] .q-num {
+  color: var(--color-primary);
+}
+
+[data-theme="dark"] .section-label {
+  color: var(--color-text-light);
+}
+
+[data-theme="dark"] .stat-label {
+  color: var(--color-text-light);
+}
+
+[data-theme="dark"] .stat-sub {
+  color: var(--color-text-light);
+}
