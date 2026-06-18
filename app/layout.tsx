@@ -1,6 +1,7 @@
 // app/layout.tsx
 import type { Metadata, Viewport } from 'next';
 import './style.css';
+import './dark-style.css';
 
 // 💡 根據新版 Next.js 規範，將 viewport 獨立導出，解決 500/警告問題
 export const viewport: Viewport = {
