@@ -66,15 +66,17 @@
   --border-width-md: 1.5px;
   --border-width-lg: 3px;
   
-  /* 陰影 */
+  /* 陰影系統 */
   --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.04);
   --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.08); /* 新增：用於浮動感 */
   
-  /* 過渡 */
-  --transition-fast: 0.15s ease;
-  --transition-base: 0.2s ease;
-  --transition-slow: 0.4s ease;
-  --transition-slower: 0.6s ease;
+  /* 過渡與動態 (現代化修改) */
+  --ease-spring: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --transition-fast: 0.15s var(--ease-spring);
+  --transition-base: 0.2s var(--ease-spring);
+  --transition-slow: 0.4s var(--ease-spring);
+  --transition-slower: 0.6s var(--ease-spring);
   
   /* 尺寸 */
   --nav-height: 54px;
@@ -89,6 +91,26 @@
   /* Z-index 分層 */
   --z-nav: 100;
   --z-loading: 200;
+}
+
+/* ============================================
+   動畫定義 (Keyframes)
+   ============================================ */
+@keyframes softFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* ============================================
@@ -124,7 +146,6 @@ nav {
   padding: 0 var(--spacing-6);
 }
 
-/* global.css 中的導航列區塊 */
 .nav-inner {
   max-width: var(--max-width);
   margin: 0 auto;
@@ -177,6 +198,7 @@ main {
   color: #A32D2D;
   margin-bottom: var(--spacing-4);
   display: none;
+  animation: softFadeIn 0.4s var(--ease-spring) forwards; /* 新增動畫 */
 }
 
 /* ============================================
@@ -184,6 +206,7 @@ main {
    ============================================ */
 .dashboard {
   display: none;
+  animation: softFadeIn 0.5s var(--ease-spring) forwards; /* 新增柔和漸顯 */
 }
 
 .section-label {
@@ -207,6 +230,12 @@ main {
   border-radius: var(--radius-xl);
   border: var(--border-width-sm) solid var(--color-border);
   padding: var(--spacing-4) var(--spacing-4);
+  transition: transform var(--transition-base), box-shadow var(--transition-base);
+}
+
+.stat-card:hover {
+  transform: translateY(-4px); /* 加強浮動感 */
+  box-shadow: var(--shadow-lg); /* 加強浮動陰影 */
 }
 
 .stat-label {
@@ -236,6 +265,12 @@ main {
   display: flex;
   align-items: center;
   gap: var(--spacing-4);
+  transition: transform var(--transition-base), box-shadow var(--transition-base); /* 新增過渡 */
+}
+
+.level-card:hover {
+  transform: translateY(-4px); /* 新增浮動感 */
+  box-shadow: var(--shadow-lg); /* 新增浮動陰影 */
 }
 
 .level-icon {
@@ -246,7 +281,7 @@ main {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: var(--font-size-5xl);
+  font-size: 24px;
   flex-shrink: 0;
 }
 
@@ -267,6 +302,12 @@ main {
   border: var(--border-width-sm) solid var(--color-border);
   padding: var(--spacing-5) var(--spacing-5);
   margin-bottom: var(--spacing-4);
+  transition: transform var(--transition-base), box-shadow var(--transition-base); /* 新增過渡 */
+}
+
+.skill-section:hover {
+  transform: translateY(-4px); /* 新增浮動感 */
+  box-shadow: var(--shadow-lg); /* 新增浮動陰影 */
 }
 
 .skill-section h3 {
@@ -339,17 +380,26 @@ main {
   font-weight: 700;
   cursor: pointer;
   font-family: inherit;
-  transition: background var(--transition-fast);
+  transition: background var(--transition-fast), transform var(--transition-base), box-shadow var(--transition-base);
   margin-top: var(--spacing-2);
 }
 
 .btn-start:hover {
   background: var(--color-primary-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md); /* 新增微微陰影 */
+}
+
+.btn-start:active {
+  transform: scale(0.98); /* 新增點擊下壓回饋 */
+  box-shadow: var(--shadow-sm);
 }
 
 .btn-start:disabled {
   background: var(--color-primary-disabled);
   cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
 /* ============================================
@@ -357,6 +407,7 @@ main {
    ============================================ */
 .reading-screen {
   display: none;
+  animation: softFadeIn 0.5s var(--ease-spring) forwards; /* 新增柔和漸顯 */
 }
 
 .progress-bar-wrap {
@@ -364,6 +415,7 @@ main {
   background: var(--color-primary-light);
   border-radius: var(--radius-sm);
   margin-bottom: var(--spacing-5);
+  overflow: hidden;
 }
 
 .progress-bar-fill {
@@ -408,6 +460,12 @@ main {
   border: var(--border-width-sm) solid var(--color-border);
   padding: var(--spacing-7) var(--spacing-7);
   margin-bottom: var(--spacing-5);
+  transition: transform var(--transition-base), box-shadow var(--transition-base); /* 新增過渡 */
+}
+
+.article-card:hover {
+  transform: translateY(-4px); /* 新增浮動感 */
+  box-shadow: var(--shadow-lg); /* 新增浮動陰影 */
 }
 
 .article-title {
@@ -440,6 +498,12 @@ main {
   border: var(--border-width-sm) solid var(--color-border);
   padding: var(--spacing-7) var(--spacing-7);
   margin-bottom: var(--spacing-5);
+  transition: transform var(--transition-base), box-shadow var(--transition-base); /* 新增過渡 */
+}
+
+.questions-card:hover {
+  transform: translateY(-4px); /* 新增浮動感 */
+  box-shadow: var(--shadow-lg); /* 新增浮動陰影 */
 }
 
 .questions-card h3 {
@@ -508,7 +572,7 @@ main {
   background: var(--color-bg-white);
   font-family: inherit;
   color: var(--color-text);
-  transition: border-color var(--transition-fast), background var(--transition-fast);
+  transition: border-color var(--transition-fast), background var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast);
   line-height: 1.5;
   display: flex;
   align-items: flex-start;
@@ -518,6 +582,13 @@ main {
 .opt-btn:hover:not(:disabled) {
   border-color: var(--color-primary);
   background: var(--color-primary-light);
+  transform: translateX(4px);
+  box-shadow: var(--shadow-sm); /* 新增微微浮起 */
+}
+
+.opt-btn:active:not(:disabled) {
+  transform: translateX(2px) scale(0.98); /* 新增點擊下壓回饋 */
+  box-shadow: none;
 }
 
 .opt-btn:disabled {
@@ -574,6 +645,7 @@ main {
   font-size: var(--font-size-md);
   display: none;
   line-height: 1.7;
+  animation: softFadeIn 0.4s var(--ease-spring) forwards; /* 新增動畫 */
 }
 
 .q-exp.show {
@@ -618,11 +690,18 @@ main {
   font-weight: 700;
   cursor: pointer;
   font-family: inherit;
-  transition: background var(--transition-fast);
+  transition: background var(--transition-fast), transform var(--transition-base), box-shadow var(--transition-base);
 }
 
-.btn-submit:hover {
+.btn-submit:hover:not(:disabled) {
   background: var(--color-primary-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md); /* 新增微微陰影 */
+}
+
+.btn-submit:active:not(:disabled) {
+  transform: scale(0.96); /* 新增點擊下壓回饋 */
+  box-shadow: none;
 }
 
 .btn-submit:disabled {
@@ -641,6 +720,13 @@ main {
   margin-bottom: var(--spacing-5);
   text-align: center;
   display: none;
+  animation: softFadeIn 0.6s var(--ease-spring) forwards; /* 新增柔和漸顯 */
+  transition: transform var(--transition-base), box-shadow var(--transition-base);
+}
+
+.result-card:hover {
+  transform: translateY(-4px); /* 新增浮動感 */
+  box-shadow: var(--shadow-lg); /* 新增浮動陰影 */
 }
 
 .result-msg {
@@ -659,12 +745,19 @@ main {
   font-weight: 700;
   cursor: pointer;
   font-family: inherit;
-  transition: background var(--transition-fast);
+  transition: background var(--transition-fast), transform var(--transition-base), box-shadow var(--transition-base);
   margin-right: var(--spacing-2);
 }
 
 .btn-next:hover {
   background: var(--color-primary-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md); /* 新增陰影 */
+}
+
+.btn-next:active {
+  transform: scale(0.96); /* 新增點擊回饋 */
+  box-shadow: none;
 }
 
 .btn-back2 {
@@ -677,11 +770,18 @@ main {
   font-weight: 600;
   cursor: pointer;
   font-family: inherit;
-  transition: background var(--transition-fast);
+  transition: background var(--transition-fast), transform var(--transition-base), box-shadow var(--transition-base);
 }
 
 .btn-back2:hover {
   background: var(--color-bg);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm); /* 新增陰影 */
+}
+
+.btn-back2:active {
+  transform: scale(0.96); /* 新增點擊回饋 */
+  box-shadow: none;
 }
 
 /* ============================================
@@ -697,6 +797,7 @@ main {
   justify-content: center;
   z-index: var(--z-loading);
   gap: var(--spacing-4);
+  animation: softFadeIn 0.3s ease-out forwards; /* 載入畫面的漸顯 */
 }
 
 .spinner {
@@ -706,12 +807,6 @@ main {
   border-top-color: var(--color-primary);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
 }
 
 .loading-text {
@@ -735,7 +830,7 @@ main {
   padding: var(--spacing-2);
   border-radius: var(--radius-md);
   color: var(--color-text-secondary);
-  transition: background var(--transition-fast), color var(--transition-fast);
+  transition: background var(--transition-fast), color var(--transition-fast), transform var(--transition-fast);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -748,6 +843,10 @@ main {
   color: var(--color-text);
 }
 
+.theme-toggle:active {
+  transform: scale(0.85); /* 新增點擊回饋 */
+}
+
 .theme-toggle svg {
   transition: transform var(--transition-base);
 }
@@ -755,6 +854,7 @@ main {
 .theme-toggle:hover svg {
   transform: rotate(15deg) scale(1.1);
 }
+
 /* ============================================
    響應式設計
    ============================================ */
