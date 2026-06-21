@@ -870,18 +870,21 @@ main {
    主題切換按鈕
    ============================================ */
 .theme-toggle {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: var(--spacing-2);
-  border-radius: var(--radius-md);
-  color: var(--color-text-secondary);
-  transition: background var(--transition-fast), color var(--transition-fast), transform var(--transition-fast);
   display: flex;
   align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
+  gap: 8px;                      /* 圖示與文字間距拉大 */
+  background: none;
+  border: none;
+  padding: var(--spacing-2) var(--spacing-4);  /* 上下 8px，左右 16px，增加點擊區域 */
+  border-radius: var(--radius-md);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: var(--font-size-lg);  /* 從 sm 改為 lg（約 14px） */
+  font-weight: 500;
+  transition: background var(--transition-fast), color var(--transition-fast);
+  min-height: 44px;               /* 確保高度舒適 */
+  min-width: 100px;               /* 預留足夠寬度 */
 }
 
 .theme-toggle:hover {
@@ -936,7 +939,64 @@ main {
   color: var(--color-text-light);
   margin-top: var(--spacing-2);
 }
+/* ============================================
+   主題下拉選單
+   ============================================ */
+.theme-selector {
+  position: relative;
+  display: inline-block;
+}
 
+.theme-toggle:hover {
+  background: var(--color-border-light);
+  color: var(--color-text);
+}
+
+.theme-toggle .theme-label {
+  margin: 0 2px;
+}
+
+.theme-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  background: var(--color-bg-white);
+  border: var(--border-width-sm) solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  min-width: 120px;
+  z-index: 10;
+  padding: var(--spacing-1) 0;
+  display: flex;
+  flex-direction: column;
+  animation: softFadeIn 0.2s var(--ease-spring) forwards;
+}
+
+.theme-option {
+  background: none;
+  border: none;
+  padding: var(--spacing-2) var(--spacing-4);
+  text-align: left;
+  font-family: inherit;
+  font-size: var(--font-size-md);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+}
+
+.theme-option:hover {
+  background: var(--color-border-light);
+  color: var(--color-text);
+}
+
+.theme-option.active {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  font-weight: 600;
+}
 /* ============================================
    響應式設計
    ============================================ */

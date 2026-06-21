@@ -1,48 +1,68 @@
 // app/context/ThemeContext.tsx
 "use client";
 
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState, useCallback } from 'react';
 
-type Theme = 'light' | 'dark';
+type Theme = 'light' | 'dark' | 'system';
 
 interface ThemeContextType {
   theme: Theme;
-  toggleTheme: () => void;
+  resolvedTheme: 'light' | 'dark'; // 實際套用的主題（解析後）
+  setTheme: (theme: Theme) => void;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<Theme>('light');
+  const [theme, setTheme] = useState<Theme>('system');
+  const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>('light');
 
-  // 初始化：從 localStorage 讀取偏好設定
+  // 初始化：從 localStorage 讀取，若無則設為 'system'
   useEffect(() => {
     const stored = localStorage.getItem('theme') as Theme | null;
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    
-    if (stored) {
+    if (stored && ['light', 'dark', 'system'].includes(stored)) {
       setTheme(stored);
-    } else if (prefersDark) {
-      setTheme('dark');
+    } else {
+      setTheme('system');
     }
   }, []);
 
-  // 套用主題到 document
+  // 監聽系統主題變化（僅在 theme === 'system' 時有效）
   useEffect(() => {
-    if (theme === 'dark') {
-      document.documentElement.setAttribute('data-theme', 'dark');
-    } else {
-      document.documentElement.removeAttribute('data-theme');
-    }
-    localStorage.setItem('theme', theme);
+    const media = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleChange = () => {
+      if (theme === 'system') {
+        setResolvedTheme(media.matches ? 'dark' : 'light');
+      }
+    };
+    // 初次設定
+    handleChange();
+    media.addEventListener('change', handleChange);
+    return () => media.removeEventListener('change', handleChange);
   }, [theme]);
 
-  const toggleTheme = () => {
-    setTheme(prev => prev === 'light' ? 'dark' : 'light');
-  };
+  // 當 theme 或 resolvedTheme 變化時套用 data-theme
+  useEffect(() => {
+    const root = document.documentElement;
+    if (theme === 'system') {
+      // 由系統決定，resolvedTheme 已更新
+      root.setAttribute('data-theme', resolvedTheme);
+    } else {
+      root.setAttribute('data-theme', theme);
+    }
+    // 儲存偏好（但若為 system，可存 'system' 或清除？我們存 'system'）
+    localStorage.setItem('theme', theme);
+  }, [theme, resolvedTheme]);
+
+  const handleSetTheme = useCallback((newTheme: Theme) => {
+    setTheme(newTheme);
+  }, []);
+
+  // 計算實際套用的主題（給其他元件使用，如下拉選單標示）
+  const effectiveTheme = theme === 'system' ? resolvedTheme : theme;
 
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+    <ThemeContext.Provider value={{ theme, resolvedTheme: effectiveTheme, setTheme: handleSetTheme }}>
       {children}
     </ThemeContext.Provider>
   );

@@ -177,3 +177,17 @@
   background: var(--color-border);
   color: var(--color-text);
 }
+/* 暗色模式下的下拉選單微調 */
+[data-theme="dark"] .theme-dropdown {
+  background: var(--color-bg-white);
+  border-color: var(--color-border);
+}
+
+[data-theme="dark"] .theme-option:hover {
+  background: var(--color-border);
+}
+
+[data-theme="dark"] .theme-option.active {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+}
