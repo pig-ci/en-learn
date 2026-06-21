@@ -187,6 +187,36 @@ nav {
   color: var(--color-primary);
 }
 
+/* ── 分頁欄樣式 ── */
+.nav-tabs {
+  display: flex;
+  gap: var(--spacing-4);
+  align-items: center;
+}
+
+.tab-btn {
+  background: none;
+  border: none;
+  padding: var(--spacing-2) var(--spacing-3);
+  font-size: var(--font-size-md);
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  font-family: inherit;
+  border-bottom: 2px solid transparent;
+  transition: color var(--transition-fast), border-color var(--transition-fast);
+  white-space: nowrap;
+}
+
+.tab-btn:hover {
+  color: var(--color-text);
+}
+
+.tab-btn.active {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+}
+
 .nav-actions {
   display: flex;
   align-items: center;
@@ -872,6 +902,42 @@ main {
 }
 
 /* ============================================
+   Coming Soon 頁面
+   ============================================ */
+.coming-soon-card {
+  background: var(--color-bg-white);
+  border-radius: var(--radius-2xl);
+  border: var(--border-width-sm) solid var(--color-border);
+  padding: var(--spacing-12) var(--spacing-7);
+  text-align: center;
+  animation: softFadeIn 0.6s var(--ease-spring) forwards;
+}
+
+.coming-soon-icon {
+  font-size: 72px;
+  margin-bottom: var(--spacing-4);
+}
+
+.coming-soon-card h2 {
+  font-size: var(--font-size-4xl);
+  font-weight: 700;
+  margin-bottom: var(--spacing-2);
+  color: var(--color-text);
+}
+
+.coming-soon-card p {
+  font-size: var(--font-size-2xl);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-2);
+}
+
+.coming-soon-sub {
+  font-size: var(--font-size-md);
+  color: var(--color-text-light);
+  margin-top: var(--spacing-2);
+}
+
+/* ============================================
    響應式設計
    ============================================ */
 @media (max-width: 560px) {
@@ -886,5 +952,20 @@ main {
   .article-card,
   .questions-card {
     padding: var(--spacing-5) var(--spacing-4);
+  }
+
+  /* 手機版分頁調整 */
+  .nav-tabs {
+    gap: var(--spacing-2);
+  }
+  .tab-btn {
+    font-size: var(--font-size-sm);
+    padding: var(--spacing-1) var(--spacing-2);
+  }
+  .nav-logo {
+    font-size: var(--font-size-md);
+  }
+  .nav-logo span {
+    display: none;
   }
 }

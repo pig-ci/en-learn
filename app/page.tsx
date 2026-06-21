@@ -106,53 +106,92 @@ function SkeletonScreen() {
         <div className="nav-inner">
           <div className="nav-left">
             <div className="nav-logo">
-              <span className="skeleton" style={{ width: 150, height: 24, display: 'inline-block' }} />
+              <span
+                className="skeleton"
+                style={{
+                  width: 150,
+                  height: 24,
+                  display: "inline-block",
+                }}
+              />
             </div>
           </div>
+          <div className="nav-tabs">
+            <span className="skeleton" style={{ width: 60, height: 30 }} />
+            <span className="skeleton" style={{ width: 60, height: 30 }} />
+            <span className="skeleton" style={{ width: 60, height: 30 }} />
+          </div>
           <div className="nav-actions">
-            <div className="skeleton" style={{ width: 36, height: 36, borderRadius: '50%' }} />
+            <div
+              className="skeleton"
+              style={{ width: 36, height: 36, borderRadius: "50%" }}
+            />
           </div>
         </div>
       </nav>
 
       <main>
         <div className="section-label">
-          <span className="skeleton" style={{ width: 80, height: 16, display: 'inline-block' }} />
+          <span
+            className="skeleton"
+            style={{ width: 80, height: 16, display: "inline-block" }}
+          />
         </div>
 
         <div className="stats-row">
-          <div className="stat-card skeleton" style={{ height: 80, border: 'none' }} />
-          <div className="stat-card skeleton" style={{ height: 80, border: 'none' }} />
-          <div className="stat-card skeleton" style={{ height: 80, border: 'none' }} />
+          <div
+            className="stat-card skeleton"
+            style={{ height: 80, border: "none" }}
+          />
+          <div
+            className="stat-card skeleton"
+            style={{ height: 80, border: "none" }}
+          />
+          <div
+            className="stat-card skeleton"
+            style={{ height: 80, border: "none" }}
+          />
         </div>
 
-        <div className="level-card" style={{ border: 'none' }}>
-          <div className="level-icon skeleton" style={{ width: 44, height: 44, borderRadius: '50%' }} />
+        <div className="level-card" style={{ border: "none" }}>
+          <div
+            className="level-icon skeleton"
+            style={{ width: 44, height: 44, borderRadius: "50%" }}
+          />
           <div className="level-info">
-            <div className="skeleton" style={{ width: 120, height: 20, marginBottom: 6 }} />
+            <div
+              className="skeleton"
+              style={{ width: 120, height: 20, marginBottom: 6 }}
+            />
             <div className="skeleton" style={{ width: 180, height: 16 }} />
           </div>
         </div>
 
-        <div className="skill-section" style={{ border: 'none' }}>
+        <div className="skill-section" style={{ border: "none" }}>
           <h3>
-            <span className="skeleton" style={{ width: 200, height: 20, display: 'inline-block' }} />
+            <span
+              className="skeleton"
+              style={{ width: 200, height: 20, display: "inline-block" }}
+            />
           </h3>
           <div className="skill-row">
-            <div className="skeleton" style={{ width: '100%', height: 16 }} />
+            <div className="skeleton" style={{ width: "100%", height: 16 }} />
           </div>
           <div className="skill-row">
-            <div className="skeleton" style={{ width: '100%', height: 16 }} />
+            <div className="skeleton" style={{ width: "100%", height: 16 }} />
           </div>
           <div className="skill-row">
-            <div className="skeleton" style={{ width: '100%', height: 16 }} />
+            <div className="skeleton" style={{ width: "100%", height: 16 }} />
           </div>
           <div className="skill-row">
-            <div className="skeleton" style={{ width: '100%', height: 16 }} />
+            <div className="skeleton" style={{ width: "100%", height: 16 }} />
           </div>
         </div>
 
-        <div className="skeleton" style={{ width: '100%', height: 56, borderRadius: 12 }} />
+        <div
+          className="skeleton"
+          style={{ width: "100%", height: 56, borderRadius: 12 }}
+        />
       </main>
     </>
   );
@@ -173,6 +212,11 @@ export default function Home() {
   const [answers, setAnswers] = useState<Record<number, number>>({});
   const [submitted, setSubmitted] = useState(false);
   const [progressBar, setProgressBar] = useState("0%");
+
+  // ── 分頁狀態 ──
+  const [activeTab, setActiveTab] = useState<"reading" | "listening" | "fill">(
+    "reading"
+  );
 
   // ── 骨架屏控制 ──
   const [showSkeleton, setShowSkeleton] = useState(true);
@@ -238,7 +282,7 @@ export default function Home() {
 
   function weakSkill(currentStats: UserStats) {
     const entries = Object.entries(currentStats.skillScores).filter(
-      ([, v]) => v.t > 0,
+      ([, v]) => v.t > 0
     );
     if (!entries.length) return null;
     return entries.sort((a, b) => a[1].c / a[1].t - b[1].c / b[1].t)[0][0];
@@ -247,7 +291,7 @@ export default function Home() {
   function calcNewLevel(
     currentStats: UserStats,
     correct: number,
-    total: number,
+    total: number
   ) {
     const pct = correct / total;
     const cur = currentStats.currentLevel || "A2";
@@ -258,7 +302,23 @@ export default function Home() {
     return LEVELS[newIdx].id;
   }
 
-  // ── 6. 開始生成文章 ──
+  // ── 6. 分頁切換 ──
+  const switchTab = (
+    tab: "reading" | "listening" | "fill"
+  ) => {
+    if (tab === activeTab) return;
+    // 若目前在閱讀畫面且要切離，則重置閱讀狀態
+    if (screen === "reading") {
+      setScreen("dashboard");
+      setArticle(null);
+      setAnswers({});
+      setSubmitted(false);
+      setProgressBar("0%");
+    }
+    setActiveTab(tab);
+  };
+
+  // ── 7. 開始生成文章 ──
   async function startReading() {
     setScreen("reading");
     setArticle(null);
@@ -356,7 +416,7 @@ export default function Home() {
     const newLevel = calcNewLevel(
       stats,
       correctCount,
-      article.questions.length,
+      article.questions.length
     );
     const newRecent = [
       ...stats.recentArticles.slice(-19),
@@ -389,10 +449,37 @@ export default function Home() {
     <>
       <nav>
         <div className="nav-inner">
-          <div className="nav-logo">
-            English <span>Reading Practice</span>
+          <div className="nav-left">
+            <div className="nav-logo">
+              English <span>Reading Practice</span>
+            </div>
           </div>
-          <ThemeToggle />
+          <div className="nav-tabs">
+            <button
+              className={`tab-btn ${activeTab === "reading" ? "active" : ""}`}
+              onClick={() => switchTab("reading")}
+              aria-label="閱讀測驗分頁"
+            >
+              閱讀測驗
+            </button>
+            <button
+              className={`tab-btn ${activeTab === "listening" ? "active" : ""}`}
+              onClick={() => switchTab("listening")}
+              aria-label="聽力測驗分頁"
+            >
+              聽力測驗
+            </button>
+            <button
+              className={`tab-btn ${activeTab === "fill" ? "active" : ""}`}
+              onClick={() => switchTab("fill")}
+              aria-label="填詞測驗分頁"
+            >
+              填詞測驗
+            </button>
+          </div>
+          <div className="nav-actions">
+            <ThemeToggle />
+          </div>
         </div>
       </nav>
 
@@ -411,203 +498,243 @@ export default function Home() {
           </div>
         )}
 
-        {/* ── DASHBOARD SCREEN ── */}
-        {screen === "dashboard" && (
-          <div className="dashboard" style={{ display: "block" }}>
-            <div className="section-label">My Progress</div>
-            <div className="stats-row">
-              <div className="stat-card">
-                <div className="stat-label">Articles</div>
-                <div className="stat-value">{stats.totalArticles}</div>
-                <div className="stat-sub">completed</div>
-              </div>
-              <div className="stat-card">
-                <div className="stat-label">Accuracy</div>
-                <div className="stat-value">{overallAccuracy}</div>
-                <div className="stat-sub">overall</div>
-              </div>
-              <div className="stat-card">
-                <div className="stat-label">Streak</div>
-                <div className="stat-value">{stats.streak}</div>
-                <div className="stat-sub">days</div>
-              </div>
-            </div>
-
-            <div className="level-card">
-              <div className="level-icon">{currentLevelInfo.icon}</div>
-              <div className="level-info">
-                <h3>{currentLevelInfo.name}</h3>
-                <p>{currentLevelInfo.desc}</p>
-              </div>
-            </div>
-
-            <div className="skill-section">
-              <h3>Question Type Performance</h3>
-              {Object.entries(stats.skillScores).map(([key, data]) => {
-                const labels: Record<string, string> = {
-                  main: "主旨題 Main Idea",
-                  detail: "細節題 Detail",
-                  inference: "推論題 Inference",
-                  vocabulary: "詞彙題 Vocabulary",
-                };
-                const pct =
-                  data.t > 0 ? Math.round((data.c / data.t) * 100) : null;
-                const fillClass =
-                  pct !== null && pct >= 70
-                    ? "fill-good"
-                    : pct !== null && pct >= 50
-                      ? "fill-mid"
-                      : "fill-weak";
-                return (
-                  <div className="skill-row" key={key}>
-                    <div className="skill-top">
-                      <span className="skill-name">{labels[key]}</span>
-                      <span className="skill-pct">
-                        {pct !== null ? `${pct}%` : "No data"}
-                      </span>
-                    </div>
-                    <div className="skill-bar">
-                      <div
-                        className={`skill-fill ${fillClass}`}
-                        style={{ width: pct !== null ? `${pct}%` : "0%" }}
-                      ></div>
-                    </div>
+        {/* ── 閱讀測驗分頁 ── */}
+        {activeTab === "reading" && (
+          <>
+            {screen === "dashboard" && (
+              <div className="dashboard" style={{ display: "block" }}>
+                <div className="section-label">My Progress</div>
+                <div className="stats-row">
+                  <div className="stat-card">
+                    <div className="stat-label">Articles</div>
+                    <div className="stat-value">{stats.totalArticles}</div>
+                    <div className="stat-sub">completed</div>
                   </div>
-                );
-              })}
-            </div>
-
-            <button className="btn-start" onClick={startReading} aria-label={stats.totalArticles === 0 ? "開始第一篇文章" : "閱讀下一篇文章"}>
-              {stats.totalArticles === 0
-                ? "Start First Article →"
-                : "Next Article →"}
-            </button>
-          </div>
-        )}
-
-        {/* ── READING SCREEN ── */}
-        {screen === "reading" && article && (
-          <div className="reading-screen" style={{ display: "block" }}>
-            <div className="progress-bar-wrap">
-              <div
-                className="progress-bar-fill"
-                style={{ width: progressBar }}
-              ></div>
-            </div>
-
-            <div className="article-meta">
-              <span className="tag tag-topic">{article.topic}</span>
-              <span className="tag tag-level">{article._level}</span>
-            </div>
-
-            <div className="article-card">
-              <div className="article-title">{article.title}</div>
-              <div
-                className="article-body"
-                dangerouslySetInnerHTML={{
-                  __html: article.body
-                    .split("\n\n")
-                    .map((p) => `<p>${p}</p>`)
-                    .join(""),
-                }}
-              ></div>
-            </div>
-
-            <div className="questions-card">
-              <h3>Comprehension Questions</h3>
-              {article.questions.map((q, qIdx) => (
-                <div className="question" key={qIdx}>
-                  <div className="q-text">
-                    <span className="q-num">{qIdx + 1}.</span>
-                    <span className="q-type-badge">{q.typeLabel}</span>
-                    {q.text}
+                  <div className="stat-card">
+                    <div className="stat-label">Accuracy</div>
+                    <div className="stat-value">{overallAccuracy}</div>
+                    <div className="stat-sub">overall</div>
                   </div>
-                  <div className="options">
-                    {q.options.map((opt, oIdx) => {
-                      const lbl = ["A", "B", "C", "D"][oIdx];
-                      const txt = opt.replace(/^[A-D]\.\s*/, "");
-
-                      let btnClass = "opt-btn";
-                      if (!submitted && answers[qIdx] === oIdx)
-                        btnClass += " selected";
-                      if (submitted) {
-                        if (oIdx === q.answer) btnClass += " correct";
-                        else if (answers[qIdx] === oIdx && oIdx !== q.answer)
-                          btnClass += " wrong";
-                      }
-
-                      return (
-                        <button
-                          className={btnClass}
-                          key={oIdx}
-                          onClick={() => pickOption(qIdx, oIdx)}
-                          disabled={submitted}
-                          aria-label={`第 ${qIdx+1} 題，選項 ${lbl}：${txt}`}
-                        >
-                          <span className="opt-label">{lbl}</span>
-                          <span>{txt}</span>
-                        </button>
-                      );
-                    })}
+                  <div className="stat-card">
+                    <div className="stat-label">Streak</div>
+                    <div className="stat-value">{stats.streak}</div>
+                    <div className="stat-sub">days</div>
                   </div>
+                </div>
 
-                  {submitted && (
-                    <div
-                      className={`q-exp show ${answers[qIdx] === q.answer ? "ok" : "no"}`}
-                    >
-                      <div className="q-exp-title">
-                        {answers[qIdx] === q.answer
-                          ? "✓ Correct"
-                          : "✗ Incorrect"}
+                <div className="level-card">
+                  <div className="level-icon">{currentLevelInfo.icon}</div>
+                  <div className="level-info">
+                    <h3>{currentLevelInfo.name}</h3>
+                    <p>{currentLevelInfo.desc}</p>
+                  </div>
+                </div>
+
+                <div className="skill-section">
+                  <h3>Question Type Performance</h3>
+                  {Object.entries(stats.skillScores).map(([key, data]) => {
+                    const labels: Record<string, string> = {
+                      main: "主旨題 Main Idea",
+                      detail: "細節題 Detail",
+                      inference: "推論題 Inference",
+                      vocabulary: "詞彙題 Vocabulary",
+                    };
+                    const pct =
+                      data.t > 0 ? Math.round((data.c / data.t) * 100) : null;
+                    const fillClass =
+                      pct !== null && pct >= 70
+                        ? "fill-good"
+                        : pct !== null && pct >= 50
+                        ? "fill-mid"
+                        : "fill-weak";
+                    return (
+                      <div className="skill-row" key={key}>
+                        <div className="skill-top">
+                          <span className="skill-name">{labels[key]}</span>
+                          <span className="skill-pct">
+                            {pct !== null ? `${pct}%` : "No data"}
+                          </span>
+                        </div>
+                        <div className="skill-bar">
+                          <div
+                            className={`skill-fill ${fillClass}`}
+                            style={{ width: pct !== null ? `${pct}%` : "0%" }}
+                          ></div>
+                        </div>
                       </div>
-                      {q.explanation}
+                    );
+                  })}
+                </div>
+
+                <button
+                  className="btn-start"
+                  onClick={startReading}
+                  aria-label={
+                    stats.totalArticles === 0
+                      ? "開始第一篇文章"
+                      : "閱讀下一篇文章"
+                  }
+                >
+                  {stats.totalArticles === 0
+                    ? "Start First Article →"
+                    : "Next Article →"}
+                </button>
+              </div>
+            )}
+
+            {screen === "reading" && article && (
+              <div className="reading-screen" style={{ display: "block" }}>
+                <div className="progress-bar-wrap">
+                  <div
+                    className="progress-bar-fill"
+                    style={{ width: progressBar }}
+                  ></div>
+                </div>
+
+                <div className="article-meta">
+                  <span className="tag tag-topic">{article.topic}</span>
+                  <span className="tag tag-level">{article._level}</span>
+                </div>
+
+                <div className="article-card">
+                  <div className="article-title">{article.title}</div>
+                  <div
+                    className="article-body"
+                    dangerouslySetInnerHTML={{
+                      __html: article.body
+                        .split("\n\n")
+                        .map((p) => `<p>${p}</p>`)
+                        .join(""),
+                    }}
+                  ></div>
+                </div>
+
+                <div className="questions-card">
+                  <h3>Comprehension Questions</h3>
+                  {article.questions.map((q, qIdx) => (
+                    <div className="question" key={qIdx}>
+                      <div className="q-text">
+                        <span className="q-num">{qIdx + 1}.</span>
+                        <span className="q-type-badge">{q.typeLabel}</span>
+                        {q.text}
+                      </div>
+                      <div className="options">
+                        {q.options.map((opt, oIdx) => {
+                          const lbl = ["A", "B", "C", "D"][oIdx];
+                          const txt = opt.replace(/^[A-D]\.\s*/, "");
+
+                          let btnClass = "opt-btn";
+                          if (!submitted && answers[qIdx] === oIdx)
+                            btnClass += " selected";
+                          if (submitted) {
+                            if (oIdx === q.answer) btnClass += " correct";
+                            else if (
+                              answers[qIdx] === oIdx &&
+                              oIdx !== q.answer
+                            )
+                              btnClass += " wrong";
+                          }
+
+                          return (
+                            <button
+                              className={btnClass}
+                              key={oIdx}
+                              onClick={() => pickOption(qIdx, oIdx)}
+                              disabled={submitted}
+                              aria-label={`第 ${qIdx + 1} 題，選項 ${lbl}：${txt}`}
+                            >
+                              <span className="opt-label">{lbl}</span>
+                              <span>{txt}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+
+                      {submitted && (
+                        <div
+                          className={`q-exp show ${
+                            answers[qIdx] === q.answer ? "ok" : "no"
+                          }`}
+                        >
+                          <div className="q-exp-title">
+                            {answers[qIdx] === q.answer
+                              ? "✓ Correct"
+                              : "✗ Incorrect"}
+                          </div>
+                          {q.explanation}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+
+                  {!submitted && (
+                    <div className="submit-row">
+                      <button
+                        className="btn-submit"
+                        onClick={submitAnswers}
+                        disabled={
+                          Object.keys(answers).length < article.questions.length
+                        }
+                        aria-label="提交閱讀測驗答案"
+                      >
+                        Submit Answers
+                      </button>
                     </div>
                   )}
                 </div>
-              ))}
 
-              {!submitted && (
-                <div className="submit-row">
-                  <button
-                    className="btn-submit"
-                    onClick={submitAnswers}
-                    disabled={
-                      Object.keys(answers).length < article.questions.length
-                    }
-                    aria-label="提交閱讀測驗答案"
-                  >
-                    Submit Answers
-                  </button>
-                </div>
-              )}
-            </div>
-
-            {submitted && (
-              <div className="result-card" style={{ display: "block" }}>
-                <div className="result-msg">
-                  練習完成！您的得分已同步至本地進度。
-                </div>
-                <div
-                  style={{
-                    display: "flex",
-                    gap: "10px",
-                    marginTop: "15px",
-                    justifyContent: "center",
-                  }}
-                >
-                  <button className="btn-next" onClick={startReading} aria-label="繼續閱讀下一篇文章">
-                    Next Article →
-                  </button>
-                  <button
-                    className="btn-back2"
-                    onClick={() => setScreen("dashboard")}
-                    aria-label="返回儀表板首頁"
-                  >
-                    Home
-                  </button>
-                </div>
+                {submitted && (
+                  <div className="result-card" style={{ display: "block" }}>
+                    <div className="result-msg">
+                      練習完成！您的得分已同步至本地進度。
+                    </div>
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: "10px",
+                        marginTop: "15px",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <button
+                        className="btn-next"
+                        onClick={startReading}
+                        aria-label="繼續閱讀下一篇文章"
+                      >
+                        Next Article →
+                      </button>
+                      <button
+                        className="btn-back2"
+                        onClick={() => setScreen("dashboard")}
+                        aria-label="返回儀表板首頁"
+                      >
+                        Home
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
+          </>
+        )}
+
+        {/* ── 聽力測驗分頁 ── */}
+        {activeTab === "listening" && (
+          <div className="coming-soon-card">
+            <div className="coming-soon-icon">🎧</div>
+            <h2>聽力測驗</h2>
+            <p>Coming Soon…</p>
+            <p className="coming-soon-sub">我們正在積極開發中，敬請期待！</p>
+          </div>
+        )}
+
+        {/* ── 填詞測驗分頁 ── */}
+        {activeTab === "fill" && (
+          <div className="coming-soon-card">
+            <div className="coming-soon-icon">✍️</div>
+            <h2>填詞測驗</h2>
+            <p>Coming Soon…</p>
+            <p className="coming-soon-sub">我們正在積極開發中，敬請期待！</p>
           </div>
         )}
       </main>
