@@ -1,7 +1,7 @@
 // app/page.tsx
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import ThemeToggle from "./components/ThemeToggle";
 // ── 1. 定義 TypeScript 型別 ──
 interface SkillScore {
@@ -98,6 +98,66 @@ const TOPICS_BY_LEVEL: Record<string, string[]> = {
   ],
 };
 
+// ── 骨架屏元件 ──
+function SkeletonScreen() {
+  return (
+    <>
+      <nav>
+        <div className="nav-inner">
+          <div className="nav-left">
+            <div className="nav-logo">
+              <span className="skeleton" style={{ width: 150, height: 24, display: 'inline-block' }} />
+            </div>
+          </div>
+          <div className="nav-actions">
+            <div className="skeleton" style={{ width: 36, height: 36, borderRadius: '50%' }} />
+          </div>
+        </div>
+      </nav>
+
+      <main>
+        <div className="section-label">
+          <span className="skeleton" style={{ width: 80, height: 16, display: 'inline-block' }} />
+        </div>
+
+        <div className="stats-row">
+          <div className="stat-card skeleton" style={{ height: 80, border: 'none' }} />
+          <div className="stat-card skeleton" style={{ height: 80, border: 'none' }} />
+          <div className="stat-card skeleton" style={{ height: 80, border: 'none' }} />
+        </div>
+
+        <div className="level-card" style={{ border: 'none' }}>
+          <div className="level-icon skeleton" style={{ width: 44, height: 44, borderRadius: '50%' }} />
+          <div className="level-info">
+            <div className="skeleton" style={{ width: 120, height: 20, marginBottom: 6 }} />
+            <div className="skeleton" style={{ width: 180, height: 16 }} />
+          </div>
+        </div>
+
+        <div className="skill-section" style={{ border: 'none' }}>
+          <h3>
+            <span className="skeleton" style={{ width: 200, height: 20, display: 'inline-block' }} />
+          </h3>
+          <div className="skill-row">
+            <div className="skeleton" style={{ width: '100%', height: 16 }} />
+          </div>
+          <div className="skill-row">
+            <div className="skeleton" style={{ width: '100%', height: 16 }} />
+          </div>
+          <div className="skill-row">
+            <div className="skeleton" style={{ width: '100%', height: 16 }} />
+          </div>
+          <div className="skill-row">
+            <div className="skeleton" style={{ width: '100%', height: 16 }} />
+          </div>
+        </div>
+
+        <div className="skeleton" style={{ width: '100%', height: 56, borderRadius: 12 }} />
+      </main>
+    </>
+  );
+}
+
 export default function Home() {
   // ── 3. 狀態管理 ──
   const [screen, setScreen] = useState<"dashboard" | "reading">("dashboard");
@@ -110,9 +170,13 @@ export default function Home() {
   const [error, setError] = useState("");
   const [isMounted, setIsMounted] = useState(false);
   const [article, setArticle] = useState<Article | null>(null);
-  const [answers, setAnswers] = useState<Record<number, number>>({}); // { 題號: 選擇的選項 }
+  const [answers, setAnswers] = useState<Record<number, number>>({});
   const [submitted, setSubmitted] = useState(false);
   const [progressBar, setProgressBar] = useState("0%");
+
+  // ── 骨架屏控制 ──
+  const [showSkeleton, setShowSkeleton] = useState(true);
+  const mountTime = useRef(Date.now());
 
   // ── 4. 初始化：從 LocalStorage 載入資料 ──
   useEffect(() => {
@@ -140,14 +204,23 @@ export default function Home() {
       setStats(initStats);
     }
     setLoading({ show: false, text: "", sub: "" });
+
+    // 保證骨架屏至少顯示 1 秒（動畫一次）
+    const elapsed = Date.now() - mountTime.current;
+    const remaining = Math.max(0, 1000 - elapsed);
+    setTimeout(() => {
+      setShowSkeleton(false);
+    }, remaining);
   }, []);
 
+  // 如果還在顯示骨架屏，直接渲染骨架
+  if (showSkeleton) {
+    return <SkeletonScreen />;
+  }
+
+  // 若尚未載入完成（理論上不會），顯示空白
   if (!isMounted || !stats) {
-    return (
-      <div style={{ background: '#F7F7F5', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ color: '#1a1a1a', fontWeight: 500 }}>Loading Studio...</div>
-      </div>
-    );
+    return null;
   }
 
   // ── 5. 邏輯輔助函式 ──
@@ -197,19 +270,21 @@ export default function Home() {
       text: "正在為您生成專屬文章...",
       sub: "這需要幾秒鐘的時間",
     });
-// 💡 使用這段邏輯，完全避開 TypeScript 的檢測地雷
-const currentStats = stats ?? { 
-  totalArticles: 0, 
-  currentLevel: "A2",
-  skillScores: { main: { c: 0, t: 0 }, detail: { c: 0, t: 0 }, inference: { c: 0, t: 0 }, vocabulary: { c: 0, t: 0 } }
-}; 
 
-const level = currentStats.currentLevel || "A2";
-const topic = pickTopic(level);
-
-// ✨ 重點：這裡傳入 currentStats，而不是那個可能會是 null 的 stats
-const weak = weakSkill(currentStats as any); 
-const isFirst = currentStats.totalArticles === 0;
+    const currentStats = stats ?? {
+      totalArticles: 0,
+      currentLevel: "A2",
+      skillScores: {
+        main: { c: 0, t: 0 },
+        detail: { c: 0, t: 0 },
+        inference: { c: 0, t: 0 },
+        vocabulary: { c: 0, t: 0 },
+      },
+    };
+    const level = currentStats.currentLevel || "A2";
+    const topic = pickTopic(level);
+    const weak = weakSkill(currentStats as any);
+    const isFirst = currentStats.totalArticles === 0;
 
     try {
       const res = await fetch("/generate", {
