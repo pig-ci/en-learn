@@ -3,226 +3,48 @@
 
 import { useState, useEffect, useRef } from "react";
 import ThemeToggle from "./components/ThemeToggle";
-// ── 1. 定義 TypeScript 型別 ──
-interface SkillScore {
-  c: number;
-  t: number;
-}
+import SkeletonScreen from "./components/SkeletonScreen";
+import Dashboard from "./components/Dashboard";
+import ReadingScreen from "./components/ReadingScreen";
+import ListeningScreen from "./components/ListeningScreen";
+import FillScreen from "./components/FillScreen";
+import { UserStats, Article } from "./types";
+import "./style.css";
+import "./dark-style.css";
 
-interface UserStats {
-  totalArticles: number;
-  totalCorrect: number;
-  totalQuestions: number;
-  streak: number;
-  lastDate: string | null;
-  currentLevel: string;
-  skillScores: Record<string, SkillScore>;
-  recentArticles: Array<{
-    title: string;
-    correct: number;
-    total: number;
-    level: string;
-    ts: number;
-  }>;
-}
-
-interface Question {
-  type: "main" | "detail" | "inference" | "vocabulary";
-  typeLabel: string;
-  text: string;
-  options: string[];
-  answer: number;
-  explanation: string;
-}
-
-interface Article {
-  title: string;
-  topic: string;
-  body: string;
-  questions: Question[];
-  _level?: string;
-}
-
-// ── 2. 靜態設定資料 ──
+// ── 靜態設定資料（可獨立抽出） ──
 const LEVELS = [
-  {
-    id: "A1",
-    name: "Beginner A1",
-    icon: "🌱",
-    desc: "Simple sentences, everyday vocabulary",
-  },
-  {
-    id: "A2",
-    name: "Elementary A2",
-    icon: "📗",
-    desc: "Short texts, familiar topics",
-  },
-  {
-    id: "B1",
-    name: "Intermediate B1",
-    icon: "📘",
-    desc: "Clear standard texts, varied topics",
-  },
-  {
-    id: "B1+",
-    name: "Upper-Intermediate B1+",
-    icon: "📙",
-    desc: "Longer texts, abstract ideas",
-  },
-  {
-    id: "B2",
-    name: "Advanced B2",
-    icon: "📕",
-    desc: "Complex texts, nuanced meaning",
-  },
+  { id: "A1", name: "Beginner A1", icon: "🌱", desc: "Simple sentences, everyday vocabulary" },
+  { id: "A2", name: "Elementary A2", icon: "📗", desc: "Short texts, familiar topics" },
+  { id: "B1", name: "Intermediate B1", icon: "📘", desc: "Clear standard texts, varied topics" },
+  { id: "B1+", name: "Upper-Intermediate B1+", icon: "📙", desc: "Longer texts, abstract ideas" },
+  { id: "B2", name: "Advanced B2", icon: "📕", desc: "Complex texts, nuanced meaning" },
 ];
 
 const TOPICS_BY_LEVEL: Record<string, string[]> = {
   A1: ["a simple school day", "animals we see every day", "my favorite food"],
-  A2: [
-    "how coffee is made",
-    "why cats sleep so much",
-    "how music makes us feel",
-  ],
-  B1: [
-    "the psychology of procrastination",
-    "how cities create their own weather",
-  ],
-  "B1+": [
-    "how language shapes the way we think",
-    "the science of habit formation",
-  ],
-  B2: [
-    "the ethics of artificial intelligence",
-    "the neuroscience of creativity",
-  ],
+  A2: ["how coffee is made", "why cats sleep so much", "how music makes us feel"],
+  B1: ["the psychology of procrastination", "how cities create their own weather"],
+  "B1+": ["how language shapes the way we think", "the science of habit formation"],
+  B2: ["the ethics of artificial intelligence", "the neuroscience of creativity"],
 };
 
-// ── 骨架屏元件 ──
-function SkeletonScreen() {
-  return (
-    <>
-      <nav>
-        <div className="nav-inner">
-          <div className="nav-left">
-            <div className="nav-logo">
-              <span
-                className="skeleton"
-                style={{
-                  width: 150,
-                  height: 24,
-                  display: "inline-block",
-                }}
-              />
-            </div>
-          </div>
-          <div className="nav-tabs">
-            <span className="skeleton" style={{ width: 60, height: 30 }} />
-            <span className="skeleton" style={{ width: 60, height: 30 }} />
-            <span className="skeleton" style={{ width: 60, height: 30 }} />
-          </div>
-          <div className="nav-actions">
-            <div
-              className="skeleton"
-              style={{ width: 36, height: 36, borderRadius: "50%" }}
-            />
-          </div>
-        </div>
-      </nav>
-
-      <main>
-        <div className="section-label">
-          <span
-            className="skeleton"
-            style={{ width: 80, height: 16, display: "inline-block" }}
-          />
-        </div>
-
-        <div className="stats-row">
-          <div
-            className="stat-card skeleton"
-            style={{ height: 80, border: "none" }}
-          />
-          <div
-            className="stat-card skeleton"
-            style={{ height: 80, border: "none" }}
-          />
-          <div
-            className="stat-card skeleton"
-            style={{ height: 80, border: "none" }}
-          />
-        </div>
-
-        <div className="level-card" style={{ border: "none" }}>
-          <div
-            className="level-icon skeleton"
-            style={{ width: 44, height: 44, borderRadius: "50%" }}
-          />
-          <div className="level-info">
-            <div
-              className="skeleton"
-              style={{ width: 120, height: 20, marginBottom: 6 }}
-            />
-            <div className="skeleton" style={{ width: 180, height: 16 }} />
-          </div>
-        </div>
-
-        <div className="skill-section" style={{ border: "none" }}>
-          <h3>
-            <span
-              className="skeleton"
-              style={{ width: 200, height: 20, display: "inline-block" }}
-            />
-          </h3>
-          <div className="skill-row">
-            <div className="skeleton" style={{ width: "100%", height: 16 }} />
-          </div>
-          <div className="skill-row">
-            <div className="skeleton" style={{ width: "100%", height: 16 }} />
-          </div>
-          <div className="skill-row">
-            <div className="skeleton" style={{ width: "100%", height: 16 }} />
-          </div>
-          <div className="skill-row">
-            <div className="skeleton" style={{ width: "100%", height: 16 }} />
-          </div>
-        </div>
-
-        <div
-          className="skeleton"
-          style={{ width: "100%", height: 56, borderRadius: 12 }}
-        />
-      </main>
-    </>
-  );
-}
-
 export default function Home() {
-  // ── 3. 狀態管理 ──
+  // ── 狀態管理 ──
   const [screen, setScreen] = useState<"dashboard" | "reading">("dashboard");
-  const [stats, setStats] = useState<any>(null);
-  const [loading, setLoading] = useState({
-    show: true,
-    text: "載入中...",
-    sub: "",
-  });
+  const [stats, setStats] = useState<UserStats | null>(null);
+  const [loading, setLoading] = useState({ show: true, text: "", sub: "" });
   const [error, setError] = useState("");
   const [isMounted, setIsMounted] = useState(false);
   const [article, setArticle] = useState<Article | null>(null);
   const [answers, setAnswers] = useState<Record<number, number>>({});
   const [submitted, setSubmitted] = useState(false);
   const [progressBar, setProgressBar] = useState("0%");
-
-  // ── 分頁狀態 ──
-  const [activeTab, setActiveTab] = useState<"reading" | "listening" | "fill">(
-    "reading"
-  );
-
-  // ── 骨架屏控制 ──
+  const [activeTab, setActiveTab] = useState<"reading" | "listening" | "fill">("reading");
   const [showSkeleton, setShowSkeleton] = useState(true);
   const mountTime = useRef(Date.now());
 
-  // ── 4. 初始化：從 LocalStorage 載入資料 ──
+  // ── 初始化：讀取 LocalStorage ──
   useEffect(() => {
     setIsMounted(true);
     const localData = localStorage.getItem("english_study_stats");
@@ -249,31 +71,16 @@ export default function Home() {
     }
     setLoading({ show: false, text: "", sub: "" });
 
-    // 保證骨架屏至少顯示 1 秒（動畫一次）
     const elapsed = Date.now() - mountTime.current;
     const remaining = Math.max(0, 1000 - elapsed);
-    setTimeout(() => {
-      setShowSkeleton(false);
-    }, remaining);
+    setTimeout(() => setShowSkeleton(false), remaining);
   }, []);
 
-  // 如果還在顯示骨架屏，直接渲染骨架
-  if (showSkeleton) {
-    return <SkeletonScreen />;
-  }
-
-  // 若尚未載入完成（理論上不會），顯示空白
-  if (!isMounted || !stats) {
-    return null;
-  }
-
-  // ── 5. 邏輯輔助函式 ──
-  const currentLevelInfo =
-    LEVELS.find((l) => l.id === stats.currentLevel) || LEVELS[1];
-  const overallAccuracy =
-    stats.totalQuestions > 0
-      ? Math.round((stats.totalCorrect / stats.totalQuestions) * 100) + "%"
-      : "—";
+  // ── 輔助函式 ──
+  const currentLevelInfo = stats ? LEVELS.find((l) => l.id === stats.currentLevel) || LEVELS[1] : LEVELS[1];
+  const overallAccuracy = stats && stats.totalQuestions > 0
+    ? Math.round((stats.totalCorrect / stats.totalQuestions) * 100) + "%"
+    : "—";
 
   function pickTopic(level: string) {
     const pool = TOPICS_BY_LEVEL[level] || TOPICS_BY_LEVEL["A2"];
@@ -281,18 +88,12 @@ export default function Home() {
   }
 
   function weakSkill(currentStats: UserStats) {
-    const entries = Object.entries(currentStats.skillScores).filter(
-      ([, v]) => v.t > 0
-    );
+    const entries = Object.entries(currentStats.skillScores).filter(([, v]) => v.t > 0);
     if (!entries.length) return null;
     return entries.sort((a, b) => a[1].c / a[1].t - b[1].c / b[1].t)[0][0];
   }
 
-  function calcNewLevel(
-    currentStats: UserStats,
-    correct: number,
-    total: number
-  ) {
+  function calcNewLevel(currentStats: UserStats, correct: number, total: number) {
     const pct = correct / total;
     const cur = currentStats.currentLevel || "A2";
     const idx = LEVELS.findIndex((l) => l.id === cur);
@@ -302,12 +103,9 @@ export default function Home() {
     return LEVELS[newIdx].id;
   }
 
-  // ── 6. 分頁切換 ──
-  const switchTab = (
-    tab: "reading" | "listening" | "fill"
-  ) => {
+  // ── 分頁切換 ──
+  const switchTab = (tab: "reading" | "listening" | "fill") => {
     if (tab === activeTab) return;
-    // 若目前在閱讀畫面且要切離，則重置閱讀狀態
     if (screen === "reading") {
       setScreen("dashboard");
       setArticle(null);
@@ -318,7 +116,7 @@ export default function Home() {
     setActiveTab(tab);
   };
 
-  // ── 7. 開始生成文章 ──
+  // ── 開始閱讀 ──
   async function startReading() {
     setScreen("reading");
     setArticle(null);
@@ -352,11 +150,9 @@ export default function Home() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ level, topic, weakSkill: weak, isFirst }),
       });
-
       if (!res.ok) throw new Error("連線失敗: " + res.status);
       const data: Article = await res.json();
       data._level = level;
-
       setArticle(data);
       setProgressBar("15%");
     } catch (e: any) {
@@ -368,25 +164,24 @@ export default function Home() {
     }
   }
 
-  // 選項點擊
+  // ── 選擇選項 ──
   function pickOption(qIdx: number, oIdx: number) {
     if (submitted || !article) return;
     const newAnswers = { ...answers, [qIdx]: oIdx };
     setAnswers(newAnswers);
-
     const done = Object.keys(newAnswers).length;
     const total = article.questions.length;
     setProgressBar(15 + Math.round((done / total) * 50) + "%");
   }
 
-  // 提交作答
+  // ── 提交答案 ──
   function submitAnswers() {
-    if (submitted || !article) return;
+    if (submitted || !article || !stats) return;
     setSubmitted(true);
     setProgressBar("80%");
 
     let correctCount = 0;
-    const bk: Record<string, SkillScore> = {
+    const bk: Record<string, { c: number; t: number }> = {
       main: { c: 0, t: 0 },
       detail: { c: 0, t: 0 },
       inference: { c: 0, t: 0 },
@@ -413,11 +208,7 @@ export default function Home() {
       newSkillScores[k].t = (newSkillScores[k].t || 0) + bk[k].t;
     });
 
-    const newLevel = calcNewLevel(
-      stats,
-      correctCount,
-      article.questions.length
-    );
+    const newLevel = calcNewLevel(stats, correctCount, article.questions.length);
     const newRecent = [
       ...stats.recentArticles.slice(-19),
       {
@@ -445,6 +236,11 @@ export default function Home() {
     setProgressBar("100%");
   }
 
+  // ── 骨架屏 ──
+  if (showSkeleton) return <SkeletonScreen />;
+  if (!isMounted || !stats) return null;
+
+  // ── 主渲染 ──
   return (
     <>
       <nav>
@@ -458,21 +254,18 @@ export default function Home() {
             <button
               className={`tab-btn ${activeTab === "reading" ? "active" : ""}`}
               onClick={() => switchTab("reading")}
-              aria-label="閱讀測驗分頁"
             >
               閱讀測驗
             </button>
             <button
               className={`tab-btn ${activeTab === "listening" ? "active" : ""}`}
               onClick={() => switchTab("listening")}
-              aria-label="聽力測驗分頁"
             >
               聽力測驗
             </button>
             <button
               className={`tab-btn ${activeTab === "fill" ? "active" : ""}`}
               onClick={() => switchTab("fill")}
-              aria-label="填詞測驗分頁"
             >
               填詞測驗
             </button>
@@ -498,245 +291,34 @@ export default function Home() {
           </div>
         )}
 
-        {/* ── 閱讀測驗分頁 ── */}
         {activeTab === "reading" && (
           <>
             {screen === "dashboard" && (
-              <div className="dashboard" style={{ display: "block" }}>
-                <div className="section-label">My Progress</div>
-                <div className="stats-row">
-                  <div className="stat-card">
-                    <div className="stat-label">Articles</div>
-                    <div className="stat-value">{stats.totalArticles}</div>
-                    <div className="stat-sub">completed</div>
-                  </div>
-                  <div className="stat-card">
-                    <div className="stat-label">Accuracy</div>
-                    <div className="stat-value">{overallAccuracy}</div>
-                    <div className="stat-sub">overall</div>
-                  </div>
-                  <div className="stat-card">
-                    <div className="stat-label">Streak</div>
-                    <div className="stat-value">{stats.streak}</div>
-                    <div className="stat-sub">days</div>
-                  </div>
-                </div>
-
-                <div className="level-card">
-                  <div className="level-icon">{currentLevelInfo.icon}</div>
-                  <div className="level-info">
-                    <h3>{currentLevelInfo.name}</h3>
-                    <p>{currentLevelInfo.desc}</p>
-                  </div>
-                </div>
-
-                <div className="skill-section">
-                  <h3>Question Type Performance</h3>
-                  {Object.entries(stats.skillScores).map(([key, data]) => {
-                    const labels: Record<string, string> = {
-                      main: "主旨題 Main Idea",
-                      detail: "細節題 Detail",
-                      inference: "推論題 Inference",
-                      vocabulary: "詞彙題 Vocabulary",
-                    };
-                    const pct =
-                      data.t > 0 ? Math.round((data.c / data.t) * 100) : null;
-                    const fillClass =
-                      pct !== null && pct >= 70
-                        ? "fill-good"
-                        : pct !== null && pct >= 50
-                        ? "fill-mid"
-                        : "fill-weak";
-                    return (
-                      <div className="skill-row" key={key}>
-                        <div className="skill-top">
-                          <span className="skill-name">{labels[key]}</span>
-                          <span className="skill-pct">
-                            {pct !== null ? `${pct}%` : "No data"}
-                          </span>
-                        </div>
-                        <div className="skill-bar">
-                          <div
-                            className={`skill-fill ${fillClass}`}
-                            style={{ width: pct !== null ? `${pct}%` : "0%" }}
-                          ></div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-
-                <button
-                  className="btn-start"
-                  onClick={startReading}
-                  aria-label={
-                    stats.totalArticles === 0
-                      ? "開始第一篇文章"
-                      : "閱讀下一篇文章"
-                  }
-                >
-                  {stats.totalArticles === 0
-                    ? "Start First Article →"
-                    : "Next Article →"}
-                </button>
-              </div>
+              <Dashboard
+                stats={stats}
+                overallAccuracy={overallAccuracy}
+                currentLevelInfo={currentLevelInfo}
+                startReading={startReading}
+                totalArticles={stats.totalArticles}
+              />
             )}
-
             {screen === "reading" && article && (
-              <div className="reading-screen" style={{ display: "block" }}>
-                <div className="progress-bar-wrap">
-                  <div
-                    className="progress-bar-fill"
-                    style={{ width: progressBar }}
-                  ></div>
-                </div>
-
-                <div className="article-meta">
-                  <span className="tag tag-topic">{article.topic}</span>
-                  <span className="tag tag-level">{article._level}</span>
-                </div>
-
-                <div className="article-card">
-                  <div className="article-title">{article.title}</div>
-                  <div
-                    className="article-body"
-                    dangerouslySetInnerHTML={{
-                      __html: article.body
-                        .split("\n\n")
-                        .map((p) => `<p>${p}</p>`)
-                        .join(""),
-                    }}
-                  ></div>
-                </div>
-
-                <div className="questions-card">
-                  <h3>Comprehension Questions</h3>
-                  {article.questions.map((q, qIdx) => (
-                    <div className="question" key={qIdx}>
-                      <div className="q-text">
-                        <span className="q-num">{qIdx + 1}.</span>
-                        <span className="q-type-badge">{q.typeLabel}</span>
-                        {q.text}
-                      </div>
-                      <div className="options">
-                        {q.options.map((opt, oIdx) => {
-                          const lbl = ["A", "B", "C", "D"][oIdx];
-                          const txt = opt.replace(/^[A-D]\.\s*/, "");
-
-                          let btnClass = "opt-btn";
-                          if (!submitted && answers[qIdx] === oIdx)
-                            btnClass += " selected";
-                          if (submitted) {
-                            if (oIdx === q.answer) btnClass += " correct";
-                            else if (
-                              answers[qIdx] === oIdx &&
-                              oIdx !== q.answer
-                            )
-                              btnClass += " wrong";
-                          }
-
-                          return (
-                            <button
-                              className={btnClass}
-                              key={oIdx}
-                              onClick={() => pickOption(qIdx, oIdx)}
-                              disabled={submitted}
-                              aria-label={`第 ${qIdx + 1} 題，選項 ${lbl}：${txt}`}
-                            >
-                              <span className="opt-label">{lbl}</span>
-                              <span>{txt}</span>
-                            </button>
-                          );
-                        })}
-                      </div>
-
-                      {submitted && (
-                        <div
-                          className={`q-exp show ${
-                            answers[qIdx] === q.answer ? "ok" : "no"
-                          }`}
-                        >
-                          <div className="q-exp-title">
-                            {answers[qIdx] === q.answer
-                              ? "✓ Correct"
-                              : "✗ Incorrect"}
-                          </div>
-                          {q.explanation}
-                        </div>
-                      )}
-                    </div>
-                  ))}
-
-                  {!submitted && (
-                    <div className="submit-row">
-                      <button
-                        className="btn-submit"
-                        onClick={submitAnswers}
-                        disabled={
-                          Object.keys(answers).length < article.questions.length
-                        }
-                        aria-label="提交閱讀測驗答案"
-                      >
-                        Submit Answers
-                      </button>
-                    </div>
-                  )}
-                </div>
-
-                {submitted && (
-                  <div className="result-card" style={{ display: "block" }}>
-                    <div className="result-msg">
-                      練習完成！您的得分已同步至本地進度。
-                    </div>
-                    <div
-                      style={{
-                        display: "flex",
-                        gap: "10px",
-                        marginTop: "15px",
-                        justifyContent: "center",
-                      }}
-                    >
-                      <button
-                        className="btn-next"
-                        onClick={startReading}
-                        aria-label="繼續閱讀下一篇文章"
-                      >
-                        Next Article →
-                      </button>
-                      <button
-                        className="btn-back2"
-                        onClick={() => setScreen("dashboard")}
-                        aria-label="返回儀表板首頁"
-                      >
-                        Home
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
+              <ReadingScreen
+                article={article}
+                answers={answers}
+                submitted={submitted}
+                progressBar={progressBar}
+                pickOption={pickOption}
+                submitAnswers={submitAnswers}
+                startReading={startReading}
+                setScreen={setScreen}
+              />
             )}
           </>
         )}
 
-        {/* ── 聽力測驗分頁 ── */}
-        {activeTab === "listening" && (
-          <div className="coming-soon-card">
-            <div className="coming-soon-icon">🎧</div>
-            <h2>聽力測驗</h2>
-            <p>Coming Soon…</p>
-            <p className="coming-soon-sub">我們正在積極開發中，敬請期待！</p>
-          </div>
-        )}
-
-        {/* ── 填詞測驗分頁 ── */}
-        {activeTab === "fill" && (
-          <div className="coming-soon-card">
-            <div className="coming-soon-icon">✍️</div>
-            <h2>填詞測驗</h2>
-            <p>Coming Soon…</p>
-            <p className="coming-soon-sub">我們正在積極開發中，敬請期待！</p>
-          </div>
-        )}
+        {activeTab === "listening" && <ListeningScreen />}
+        {activeTab === "fill" && <FillScreen />}
       </main>
     </>
   );
