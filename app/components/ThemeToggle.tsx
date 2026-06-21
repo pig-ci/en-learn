@@ -20,7 +20,7 @@ export default function ThemeToggle() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // 根據主題顯示不同的圖示（按鈕上的圖示）
+  // 按鈕圖示
   const getToggleIcon = () => {
     if (theme === 'system') {
       return (
@@ -36,7 +36,30 @@ export default function ThemeToggle() {
           <path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401" />
         </svg>
       );
+    } else if (theme === 'gray') {
+      // 灰色主題圖示：Sun-Moon
+      return (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M12 2v2" />
+          <path d="M14.837 16.385a6 6 0 1 1-7.223-7.222c.624-.147.97.66.715 1.248a4 4 0 0 0 5.26 5.259c.589-.255 1.396.09 1.248.715" />
+          <path d="M16 12a4 4 0 0 0-4-4" />
+          <path d="m19 5-1.256 1.256" />
+          <path d="M20 12h2" />
+        </svg>
+      );
+    } else if (theme === 'star') {
+      // 深藍太空主題圖示：Orbit
+      return (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M20.341 6.484A10 10 0 0 1 10.266 21.85" />
+          <path d="M3.659 17.516A10 10 0 0 1 13.74 2.152" />
+          <circle cx="12" cy="12" r="3" />
+          <circle cx="19" cy="5" r="2" />
+          <circle cx="5" cy="19" r="2" />
+        </svg>
+      );
     } else {
+      // light
       return (
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <circle cx="12" cy="12" r="4" />
@@ -53,9 +76,12 @@ export default function ThemeToggle() {
     }
   };
 
+  // 按鈕文字
   const getLabel = () => {
     if (theme === 'system') return '系統';
     if (theme === 'dark') return '暗色';
+    if (theme === 'gray') return '灰色';
+    if (theme === 'star') return '星空';
     return '亮色';
   };
 
@@ -112,6 +138,34 @@ export default function ThemeToggle() {
               <line x1="12" y1="17" x2="12" y2="21" />
             </svg>
             系統
+          </button>
+          {/* 新增灰色 */}
+          <button
+            className={`theme-option ${theme === 'gray' ? 'active' : ''}`}
+            onClick={() => { setTheme('gray'); setIsOpen(false); }}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 2v2" />
+              <path d="M14.837 16.385a6 6 0 1 1-7.223-7.222c.624-.147.97.66.715 1.248a4 4 0 0 0 5.26 5.259c.589-.255 1.396.09 1.248.715" />
+              <path d="M16 12a4 4 0 0 0-4-4" />
+              <path d="m19 5-1.256 1.256" />
+              <path d="M20 12h2" />
+            </svg>
+            灰色
+          </button>
+          {/* 新增太空 */}
+          <button
+            className={`theme-option ${theme === 'star' ? 'active' : ''}`}
+            onClick={() => { setTheme('star'); setIsOpen(false); }}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M20.341 6.484A10 10 0 0 1 10.266 21.85" />
+              <path d="M3.659 17.516A10 10 0 0 1 13.74 2.152" />
+              <circle cx="12" cy="12" r="3" />
+              <circle cx="19" cy="5" r="2" />
+              <circle cx="5" cy="19" r="2" />
+            </svg>
+            星空
           </button>
         </div>
       )}

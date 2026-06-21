@@ -1,7 +1,9 @@
 // app/layout.tsx
 import type { Metadata, Viewport } from 'next';
-import './style.css';
-import './dark-style.css';
+import './style/style.css';
+import './style/dark-style.css';
+import './style/grey-style.css';      // 新增
+import './style/star-style.css'; // 新增
 import { ThemeProvider } from './context/ThemeContext';
 
 export const viewport: Viewport = {
@@ -29,7 +31,7 @@ export default function RootLayout({
               (function() {
                 try {
                   const theme = localStorage.getItem('theme');
-                  if (theme === 'light' || theme === 'dark') {
+                  if (theme === 'light' || theme === 'dark' || theme === 'gray' || theme === 'star' || theme === 'deep-blue') {
                     document.documentElement.setAttribute('data-theme', theme);
                   } else if (theme === 'system') {
                     // 如果是 system，則不設置，讓瀏覽器預設（但我們希望跟隨系統，所以根據 prefers-color-scheme 設置）

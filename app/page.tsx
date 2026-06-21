@@ -9,8 +9,10 @@ import ReadingScreen from "./components/ReadingScreen";
 import ListeningScreen from "./components/ListeningScreen";
 import FillScreen from "./components/FillScreen";
 import { UserStats, Article } from "./types";
-import "./style.css";
-import "./dark-style.css";
+import "./style/style.css";
+import "./style/dark-style.css";
+import './style/grey-style.css';      // 新增
+import './style/star-style.css'; // 新增
 
 // ── 靜態設定資料（可獨立抽出） ──
 const LEVELS = [

@@ -1,0 +1,28 @@
+/* app/grey-style.css */
+[data-theme="gray"] {
+  /* 主色 – 冷灰藍，強化灰色調 */
+  --color-primary: #5A6B7C;
+  --color-primary-hover: #4A5B6C;
+  --color-primary-light: #E2E8F0;
+  --color-primary-disabled: #A0B0C0;
+
+  --color-success: #5A7C6B;
+  --color-success-light: #E8F0EC;
+  --color-warning: #8C7A5A;
+  --color-danger: #7C5A5A;
+  --color-danger-light: #F0E8E8;
+
+  /* 文字 – 更灰階 */
+  --color-text: #2D3748;
+  --color-text-secondary: #4A5568;
+  --color-text-light: #718096;
+  --color-text-white: #F7FAFC;
+
+  /* 背景 – 偏冷灰白，明顯比亮色(#F7F7F5)更灰 */
+  --color-bg: #c4cfd9;
+  --color-bg-white: #dfe5e9;
+  --color-border: #CBD5E0;
+  --color-border-light: #E2E8F0;
+
+  /* 其餘變數沿用基礎定義 */
+}

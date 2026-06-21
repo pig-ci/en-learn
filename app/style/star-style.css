@@ -1,0 +1,29 @@
+/* app/star-style.css (或 deep-blue-style.css) */
+[data-theme="star"] {  /* 若保持 deep-blue，則改為 [data-theme="deep-blue"] */
+  /* 主色 – 亮藍，對比暗色 */
+  --color-primary: #60A5FA;
+  --color-primary-hover: #93C5FD;
+  --color-primary-light: #1E3A5F;
+  --color-primary-disabled: #2D4A7A;
+
+  --color-success: #34D399;
+  --color-success-light: #1A3A2A;
+  --color-warning: #FBBF24;
+  --color-danger: #F87171;
+  --color-danger-light: #3A1A1A;
+
+  /* 文字 – 淡藍白，與暗色(#E5E7EB)區別 */
+  --color-text: #E0E7FF;
+  --color-text-secondary: #A5B4FC;
+  --color-text-light: #818CF8;
+  --color-text-white: #F8FAFF;
+
+  /* 背景 – 深藍黑，與暗色(#111827)明顯不同，更藍更暗 */
+  --color-bg: #0A0E1A;
+  --color-bg-white: #121828;
+  --color-border: #2A3A5A;
+  --color-border-light: #1A2A3A;
+
+  /* 載入覆蓋層微調 */
+  --loading-overlay-opacity: 0.92;
+}
