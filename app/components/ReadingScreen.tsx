@@ -1,5 +1,6 @@
 // app/components/ReadingScreen.tsx
 import { Article } from "../types";
+import { useState, useRef, useEffect } from "react";
 
 interface ReadingScreenProps {
   article: Article;
@@ -10,6 +11,7 @@ interface ReadingScreenProps {
   submitAnswers: () => void;
   startReading: () => void;
   setScreen: (screen: "dashboard" | "reading") => void;
+  mode?: 'reading' | 'listening'; // 新增
 }
 
 export default function ReadingScreen({
@@ -21,7 +23,54 @@ export default function ReadingScreen({
   submitAnswers,
   startReading,
   setScreen,
+  mode = 'reading',
 }: ReadingScreenProps) {
+  // ── 語音合成狀態 ──
+  const [isPlaying, setIsPlaying] = useState(false);
+  const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
+
+  // 當組件卸載或文章變更時，停止語音
+  useEffect(() => {
+    return () => {
+      if (window.speechSynthesis) {
+        window.speechSynthesis.cancel();
+      }
+    };
+  }, [article]);
+
+  // 播放音頻
+  const handlePlay = () => {
+    if (!window.speechSynthesis) {
+      alert('您的瀏覽器不支援語音合成功能，請使用 Chrome 或 Edge。');
+      return;
+    }
+    // 取消之前的合成
+    window.speechSynthesis.cancel();
+
+    // 清理文本：移除 HTML 標籤（若存在）並合併段落
+    const plainText = article.body.replace(/<[^>]+>/g, '').replace(/\n/g, ' ');
+    const utterance = new SpeechSynthesisUtterance(plainText);
+    utterance.lang = 'en-US';
+    utterance.rate = 0.9; // 稍慢，適合學習
+    utterance.pitch = 1;
+    utterance.volume = 1;
+
+    utterance.onstart = () => setIsPlaying(true);
+    utterance.onend = () => setIsPlaying(false);
+    utterance.onerror = () => setIsPlaying(false);
+
+    utteranceRef.current = utterance;
+    window.speechSynthesis.speak(utterance);
+  };
+
+  // 停止音頻
+  const handleStop = () => {
+    if (window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+      setIsPlaying(false);
+    }
+  };
+
   return (
     <div className="reading-screen" style={{ display: "block" }}>
       <div className="progress-bar-wrap">
@@ -34,19 +83,45 @@ export default function ReadingScreen({
       <div className="article-meta">
         <span className="tag tag-topic">{article.topic}</span>
         <span className="tag tag-level">{article._level}</span>
+        {mode === 'listening' && <span className="tag tag-listening">🎧 聽力</span>}
       </div>
 
       <div className="article-card">
         <div className="article-title">{article.title}</div>
-        <div
-          className="article-body"
-          dangerouslySetInnerHTML={{
-            __html: article.body
-              .split("\n\n")
-              .map((p) => `<p>${p}</p>`)
-              .join(""),
-          }}
-        ></div>
+        {mode === 'reading' ? (
+          <div
+            className="article-body"
+            dangerouslySetInnerHTML={{
+              __html: article.body
+                .split("\n\n")
+                .map((p) => `<p>${p}</p>`)
+                .join(""),
+            }}
+          ></div>
+        ) : (
+          <div className="listening-controls">
+            <p className="listening-instruction">🎧 請聽以下文章，然後回答問題</p>
+            <div className="audio-controls">
+              <button
+                className="audio-btn play-btn"
+                onClick={handlePlay}
+                disabled={isPlaying}
+                aria-label="播放文章"
+              >
+                ▶ 播放
+              </button>
+              <button
+                className="audio-btn stop-btn"
+                onClick={handleStop}
+                disabled={!isPlaying}
+                aria-label="停止播放"
+              >
+                ⏹ 停止
+              </button>
+              <span className="audio-status">{isPlaying ? '🔊 播放中...' : '⏸ 已停止'}</span>
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="questions-card">
@@ -108,7 +183,7 @@ export default function ReadingScreen({
               className="btn-submit"
               onClick={submitAnswers}
               disabled={Object.keys(answers).length < article.questions.length}
-              aria-label="提交閱讀測驗答案"
+              aria-label="提交測驗答案"
             >
               Submit Answers
             </button>
@@ -132,14 +207,14 @@ export default function ReadingScreen({
             <button
               className="btn-next"
               onClick={startReading}
-              aria-label="繼續閱讀下一篇文章"
+              aria-label="繼續下一篇"
             >
-              Next Article →
+              Next {mode === 'listening' ? 'Listening' : 'Article'} →
             </button>
             <button
               className="btn-back2"
               onClick={() => setScreen("dashboard")}
-              aria-label="返回儀表板首頁"
+              aria-label="返回儀表板"
             >
               Home
             </button>

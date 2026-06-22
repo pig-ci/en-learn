@@ -5,17 +5,23 @@ interface DashboardProps {
   stats: UserStats;
   overallAccuracy: string;
   currentLevelInfo: { id: string; name: string; icon: string; desc: string };
-  startReading: () => void;
+  onStart: () => void;
   totalArticles: number;
+  mode: 'reading' | 'listening';
 }
 
 export default function Dashboard({
   stats,
   overallAccuracy,
   currentLevelInfo,
-  startReading,
+  onStart,
   totalArticles,
+  mode,
 }: DashboardProps) {
+  const buttonLabel = totalArticles === 0 
+  ? (mode === 'listening' ? "Start First Listening →" : mode === 'fill' ? "Start First Fill-in →" : "Start First Article →")
+  : (mode === 'listening' ? "Next Listening →" : mode === 'fill' ? "Next Fill-in →" : "Next Article →");
+
   return (
     <div className="dashboard" style={{ display: "block" }}>
       <div className="section-label">My Progress</div>
@@ -82,12 +88,10 @@ export default function Dashboard({
 
       <button
         className="btn-start"
-        onClick={startReading}
-        aria-label={
-          totalArticles === 0 ? "開始第一篇文章" : "閱讀下一篇文章"
-        }
+        onClick={onStart}
+        aria-label={buttonLabel}
       >
-        {totalArticles === 0 ? "Start First Article →" : "Next Article →"}
+        {buttonLabel}
       </button>
     </div>
   );

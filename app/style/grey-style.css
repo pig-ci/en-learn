@@ -26,3 +26,8 @@
 
   /* 其餘變數沿用基礎定義 */
 }
+
+[data-theme="gray"] .tag-listening {
+  background: #D1D5DB;
+  color: #4B5563;
+}

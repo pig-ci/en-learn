@@ -11,10 +11,10 @@ import FillScreen from "./components/FillScreen";
 import { UserStats, Article } from "./types";
 import "./style/style.css";
 import "./style/dark-style.css";
-import './style/grey-style.css';      // 新增
-import './style/star-style.css'; // 新增
+import "./style/grey-style.css";
+import "./style/star-style.css";
 
-// ── 靜態設定資料（可獨立抽出） ──
+// ── 靜態設定資料 ──
 const LEVELS = [
   { id: "A1", name: "Beginner A1", icon: "🌱", desc: "Simple sentences, everyday vocabulary" },
   { id: "A2", name: "Elementary A2", icon: "📗", desc: "Short texts, familiar topics" },
@@ -35,7 +35,7 @@ export default function Home() {
   // ── 狀態管理 ──
   const [screen, setScreen] = useState<"dashboard" | "reading">("dashboard");
   const [stats, setStats] = useState<UserStats | null>(null);
-  const [loading, setLoading] = useState({ show: true, text: "", sub: "" });
+  const [loading, setLoading] = useState({ show: false, text: "", sub: "" });
   const [error, setError] = useState("");
   const [isMounted, setIsMounted] = useState(false);
   const [article, setArticle] = useState<Article | null>(null);
@@ -46,7 +46,7 @@ export default function Home() {
   const [showSkeleton, setShowSkeleton] = useState(true);
   const mountTime = useRef(Date.now());
 
-  // ── 初始化：讀取 LocalStorage ──
+  // ── 初始化 ──
   useEffect(() => {
     setIsMounted(true);
     const localData = localStorage.getItem("english_study_stats");
@@ -118,16 +118,17 @@ export default function Home() {
     setActiveTab(tab);
   };
 
-  // ── 開始閱讀 ──
-  async function startReading() {
+  // ── 開始練習（閱讀／聽力／填空） ──
+  async function startReading(mode: 'reading' | 'listening' | 'fill' = 'reading') {
     setScreen("reading");
     setArticle(null);
     setAnswers({});
     setSubmitted(false);
     setProgressBar("0%");
+    const modeText = mode === 'listening' ? '聽力' : mode === 'fill' ? '填空' : '閱讀';
     setLoading({
       show: true,
-      text: "正在為您生成專屬文章...",
+      text: `正在為您生成${modeText}文章...`,
       sub: "這需要幾秒鐘的時間",
     });
 
@@ -150,7 +151,7 @@ export default function Home() {
       const res = await fetch("/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ level, topic, weakSkill: weak, isFirst }),
+        body: JSON.stringify({ level, topic, weakSkill: weak, isFirst, mode }),
       });
       if (!res.ok) throw new Error("連線失敗: " + res.status);
       const data: Article = await res.json();
@@ -166,7 +167,7 @@ export default function Home() {
     }
   }
 
-  // ── 選擇選項 ──
+  // ── 選擇選項（閱讀題） ──
   function pickOption(qIdx: number, oIdx: number) {
     if (submitted || !article) return;
     const newAnswers = { ...answers, [qIdx]: oIdx };
@@ -176,8 +177,8 @@ export default function Home() {
     setProgressBar(15 + Math.round((done / total) * 50) + "%");
   }
 
-  // ── 提交答案 ──
-  function submitAnswers() {
+  // ── 提交答案（閱讀題與填空題） ──
+  function submitAnswers(fillAnswers?: Record<number, number>) {
     if (submitted || !article || !stats) return;
     setSubmitted(true);
     setProgressBar("80%");
@@ -190,6 +191,7 @@ export default function Home() {
       vocabulary: { c: 0, t: 0 },
     };
 
+    // 處理閱讀理解題
     article.questions.forEach((q, i) => {
       const chosen = answers[i];
       const isCorrect = chosen === q.answer;
@@ -197,6 +199,22 @@ export default function Home() {
       bk[q.type].t++;
       if (isCorrect) bk[q.type].c++;
     });
+
+    // 處理填空題（如果有）
+    let fillCorrect = 0;
+    let fillTotal = 0;
+    if (article.fillBlanks && fillAnswers) {
+      fillTotal = article.fillBlanks.length;
+      article.fillBlanks.forEach((fb, idx) => {
+        const chosen = fillAnswers[idx];
+        const isCorrect = (chosen !== undefined && fb.options[chosen] === fb.correctWord);
+        if (isCorrect) fillCorrect++;
+        // 將填空歸類為 vocabulary 技能
+        bk.vocabulary.t++;
+        if (isCorrect) bk.vocabulary.c++;
+      });
+      correctCount += fillCorrect;
+    }
 
     const today = new Date().toDateString();
     const last = stats.lastDate;
@@ -210,13 +228,14 @@ export default function Home() {
       newSkillScores[k].t = (newSkillScores[k].t || 0) + bk[k].t;
     });
 
-    const newLevel = calcNewLevel(stats, correctCount, article.questions.length);
+    const totalQ = article.questions.length + (article.fillBlanks ? article.fillBlanks.length : 0);
+    const newLevel = calcNewLevel(stats, correctCount, totalQ);
     const newRecent = [
       ...stats.recentArticles.slice(-19),
       {
         title: article.title,
         correct: correctCount,
-        total: article.questions.length,
+        total: totalQ,
         level: article._level || "A2",
         ts: Date.now(),
       },
@@ -225,7 +244,7 @@ export default function Home() {
     const updatedStats: UserStats = {
       totalArticles: stats.totalArticles + 1,
       totalCorrect: stats.totalCorrect + correctCount,
-      totalQuestions: stats.totalQuestions + article.questions.length,
+      totalQuestions: stats.totalQuestions + totalQ,
       streak,
       lastDate: today,
       currentLevel: newLevel,
@@ -293,15 +312,17 @@ export default function Home() {
           </div>
         )}
 
-        {activeTab === "reading" && (
+        {/* 閱讀與聽力共用 ReadingScreen */}
+        {(activeTab === "reading" || activeTab === "listening") && (
           <>
             {screen === "dashboard" && (
               <Dashboard
                 stats={stats}
                 overallAccuracy={overallAccuracy}
                 currentLevelInfo={currentLevelInfo}
-                startReading={startReading}
+                onStart={() => startReading(activeTab === 'listening' ? 'listening' : 'reading')}
                 totalArticles={stats.totalArticles}
+                mode={activeTab === 'listening' ? 'listening' : 'reading'}
               />
             )}
             {screen === "reading" && article && (
@@ -311,16 +332,40 @@ export default function Home() {
                 submitted={submitted}
                 progressBar={progressBar}
                 pickOption={pickOption}
-                submitAnswers={submitAnswers}
-                startReading={startReading}
+                submitAnswers={() => submitAnswers()}
+                startReading={() => startReading(activeTab === 'listening' ? 'listening' : 'reading')}
                 setScreen={setScreen}
+                mode={activeTab === 'listening' ? 'listening' : 'reading'}
               />
             )}
           </>
         )}
 
-        {activeTab === "listening" && <ListeningScreen />}
-        {activeTab === "fill" && <FillScreen />}
+        {/* 填空測驗使用 FillScreen */}
+        {activeTab === "fill" && (
+          <>
+            {screen === "dashboard" && (
+              <Dashboard
+                stats={stats}
+                overallAccuracy={overallAccuracy}
+                currentLevelInfo={currentLevelInfo}
+                onStart={() => startReading('fill')}
+                totalArticles={stats.totalArticles}
+                mode="fill"
+              />
+            )}
+            {screen === "reading" && article && (
+              <FillScreen
+                article={article}
+                submitted={submitted}
+                progressBar={progressBar}
+                submitAnswers={submitAnswers}
+                startReading={() => startReading('fill')}
+                setScreen={setScreen}
+              />
+            )}
+          </>
+        )}
       </main>
     </>
   );

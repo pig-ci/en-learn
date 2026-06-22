@@ -1,23 +1,26 @@
-# English Reading Practice
+# English Reading & Listening Practice
 
-一個基於 Next.js 和 Google Gemini AI 的英文閱讀練習平台，專為台灣國中生準備會考而設計。透過 AI 生成個人化文章與閱讀測驗，幫助學生提升英文閱讀能力。
+一個基於 Next.js 和 Google Gemini AI 的英文閱讀、聽力與填空練習平台，專為台灣國中生準備會考而設計。透過 AI 生成個人化文章與多樣化測驗，全面提升英文能力。
 
 [![Next.js](https://img.shields.io/badge/Next.js-15.2.7-blue?style=flat-square&logo=next.js)](https://nextjs.org/)
 [![React](https://img.shields.io/badge/React-19.0.0-blue?style=flat-square&logo=react)](https://reactjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8.2-blue?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
-[![Google Gemini](https://img.shields.io/badge/Google_Gemini-3.1_Flash-orange?style=flat-square&logo=google)](https://deepmind.google/technologies/gemini/)
+[![Google Gemini](https://img.shields.io/badge/Google_Gemini-2.5_Flash-orange?style=flat-square&logo=google)](https://deepmind.google/technologies/gemini/)
 [![License](https://img.shields.io/badge/License-GPLv3.0-green?style=flat-square)](LICENSE)
 
 ---
 
 ## 功能特色
 
-- **AI 生成文章**：根據學生的程度（A1-B2）自動生成適合的閱讀文章
-- **會考題型練習**：每篇文章包含 4 種會考題型（主旨題、細節題、推論題、詞彙題）
-- **學習進度追蹤**：記錄答題正確率、連續學習天數、各題型表現
-- **個人化學習**：根據弱點題型自動加強練習
+- **三種練習模式**：閱讀測驗、聽力測驗（使用瀏覽器 TTS 朗讀）、填空測驗（關鍵詞填空）
+- **AI 生成文章**：根據學生的程度（A1-B2）自動生成適合的文章，並根據弱點題型加強練習
+- **會考題型練習**：每篇文章包含 4 種會考選擇題（主旨題、細節題、推論題、詞彙題）
+- **填空專項訓練**：從文章中挖空 4-6 個關鍵詞，提供四個選項（A1/A2 選擇題形式），加強詞彙與上下文理解
+- **學習進度追蹤**：記錄答題正確率、連續學習天數、各題型表現（閱讀與填空題皆歸入詞彙題統計）
+- **個人化難度調整**：根據近期表現自動升降級（A1 ~ B2）
+- **多種主題模式**：亮色、暗色、灰色、星空四種視覺主題，保護眼睛並提供個人化體驗
 - **響應式設計**：完美支援手機、平板、電腦裝置
-- **本地資料儲存**：使用 LocalStorage 保存學習進度
+- **本地資料儲存**：使用 LocalStorage 保存學習進度，無需註冊即可使用
 
 ---
 
@@ -70,7 +73,8 @@ pnpm dev
 - **框架**：Next.js 15.2.7 (App Router)
 - **語言**：TypeScript 5.8.2
 - **UI 框架**：React 19.0.0
-- **樣式**：純 CSS（漸進式增強）
+- **樣式**：純 CSS（支援亮色／暗色／灰色／星空主題）
+- **語音合成**：Web Speech API（用於聽力模式）
 
 ### 後端
 - **API 路由**：Next.js API Routes
@@ -87,19 +91,32 @@ pnpm dev
 ## 專案結構
 
 ```
-english-reading-practice/
+en-learn/
 ├── app/
 │   ├── generate/
-│   │   └── route.ts          # Gemini API 路由
-│   ├── layout.tsx            # 根布局
-│   ├── page.tsx              # 主要頁面
-│   └── global.css            # 全域樣式
-├── public/                   # 靜態資源
-├── .env.example              # 環境變數範例
-├── next.config.js            # Next.js 配置
-├── package.json              # 專案依賴
-├── tsconfig.json             # TypeScript 配置
-└── README.md                 # 專案說明
+│   │   └── route.ts              # Gemini API 路由（支援 reading/listening/fill 模式）
+│   ├── components/
+│   │   ├── Dashboard.tsx         # 儀表板（顯示統計、等級、各題型表現）
+│   │   ├── ReadingScreen.tsx     # 閱讀與聽力共用畫面（含語音控制）
+│   │   ├── FillScreen.tsx        # 填空測驗畫面
+│   │   ├── SkeletonScreen.tsx    # 載入骨架
+│   │   └── ThemeToggle.tsx       # 主題切換下拉選單
+│   ├── context/
+│   │   └── ThemeContext.tsx      # 主題狀態管理
+│   ├── style/
+│   │   ├── style.css             # 基礎樣式
+│   │   ├── dark-style.css        # 暗色主題
+│   │   ├── grey-style.css        # 灰色主題
+│   │   └── star-style.css        # 星空主題
+│   ├── types.ts                  # TypeScript 型別定義（含 FillBlank）
+│   ├── layout.tsx                # 根布局（含主題初始化）
+│   └── page.tsx                  # 主要頁面（切換模式與狀態管理）
+├── public/                       # 靜態資源
+├── .env.example                  # 環境變數範例
+├── next.config.js                # Next.js 配置
+├── package.json                  # 專案依賴
+├── tsconfig.json                 # TypeScript 配置
+└── README.md                     # 專案說明
 ```
 
 ---
@@ -107,42 +124,64 @@ english-reading-practice/
 ## 使用說明
 
 ### 儀表板 (Dashboard)
-- 查看學習統計（文章數、正確率、連續天數）
-- 顯示當前等級與各題型表現
-- 點擊「Next Article」開始練習
+- 查看學習統計（完成文章數、整體正確率、連續學習天數）
+- 顯示當前等級與各題型表現（主旨、細節、推論、詞彙）
+- 根據當前選擇的模式（閱讀／聽力／填空），點擊「Start First …」或「Next …」開始練習
 
-### 閱讀練習 (Reading)
-1. 閱讀 AI 生成的文章
-2. 回答 4 道選擇題
+### 閱讀測驗
+1. 閱讀 AI 生成的文章（含重點詞彙標記 `<u>`）
+2. 回答 4 道選擇題（主旨、細節、推論、詞彙）
 3. 提交答案查看解析
 4. 系統自動記錄成績並調整等級
 
+### 聽力測驗
+1. 頁面顯示文章標題與題目，但**文章內容隱藏**
+2. 點擊「播放」按鈕，瀏覽器以英文朗讀全文（可使用 Chrome / Edge / Safari）
+3. 聽完後回答相同的 4 道選擇題
+4. 提交答案後獲得回饋，成績納入統計
+
+### 填空測驗
+1. 閱讀文章，其中 4-6 個關鍵詞被替換為 `____`
+2. 每個空格提供四個選項（A/B/C/D），選出最合適的單詞
+3. 所有空格填完後提交答案
+4. 系統會顯示正確答案與錯誤解析，成績同時納入統計（計入詞彙題正確率）
+
+### 主題切換
+- 點擊導航列右側的主題圖示，可從下拉選單中選擇：
+  - **亮色**（預設）
+  - **暗色**（護眼）
+  - **灰色**（低對比）
+  - **星空**（深藍黑色背景，適合夜間）
+- 選擇會立即套用，並儲存於 LocalStorage
+
 ### 等級系統
-| 等級 | 說明 | 字數範圍 |
+| 等級 | 說明 | 文章字數範圍 |
 | :--- | :--- | :--- |
-| A1 | 初級 Beginner | 100-130 字 |
-| A2 | 基礎 Elementary | 140-170 字 |
-| B1 | 中級 Intermediate | 180-230 字 |
-| B1+ | 中高級 Upper-Intermediate | 220-260 字 |
-| B2 | 高級 Advanced | 250-290 字 |
+| A1   | 初級 Beginner       | 80–100 字 |
+| A2   | 基礎 Elementary     | 100–130 字 |
+| B1   | 中級 Intermediate   | 130–160 字 |
+| B1+  | 中高級 Upper-Intermediate | 160–190 字 |
+| B2   | 高級 Advanced       | 190–220 字 |
+- 系統會根據最近答題正確率自動升降級（≥85% 升級，<50% 降級）
 
 ---
 
-## 測試
+## 測試 API (本地)
 
-### 本地測試 API
 ```bash
 curl -X POST http://localhost:3000/generate \
   -H "Content-Type: application/json" \
-  -d '{"level":"A2","topic":"how coffee is made","weakSkill":null,"isFirst":true}'
+  -d '{"level":"A2","topic":"how coffee is made","weakSkill":null,"isFirst":true,"mode":"reading"}'
 ```
+支援的 `mode` 參數：`reading`、`listening`、`fill`
 
 ---
 
 ## 數據持久化
 
 所有學習進度儲存在瀏覽器的 LocalStorage 中：
-- `english_study_stats`：包含文章數、正確率、連續天數、各題型表現等
+- Key: `english_study_stats`
+- 內容包括：文章數、正確數、總題數、連續天數、當前等級、各題型累計答對/答錯數、最近 20 篇文章記錄
 
 ---
 
@@ -169,9 +208,10 @@ curl -X POST http://localhost:3000/generate \
 - [Next.js](https://nextjs.org/) - React 框架
 - [Google Gemini](https://deepmind.google/technologies/gemini/) - AI 生成引擎
 - [Google Fonts](https://fonts.google.com/) - 字型服務
+- Web Speech API - 瀏覽器語音合成
 
 ---
 
 ## 聯絡
 
-如有問題，請開啟 [Issue](https://github.com/your-username/english-reading-practice/issues) 或聯絡專案維護者。
+如有問題，請開啟 [Issue](https://github.com/pig-ci/en-learn/issues) 或聯絡專案維護者。

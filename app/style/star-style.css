@@ -27,3 +27,8 @@
   /* 載入覆蓋層微調 */
   --loading-overlay-opacity: 0.92;
 }
+
+[data-theme="star"] .tag-listening {
+  background: #1E3A5F;
+  color: #93C5FD;
+}
