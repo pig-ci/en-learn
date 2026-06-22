@@ -237,11 +237,11 @@ main {
    ============================================ */
 .error-box {
   background: var(--color-danger-light);
-  border: var(--border-width-sm) solid #F7C1C1;
+  border: var(--border-width-sm) solid var(--color-danger);
   border-radius: var(--radius-lg);
   padding: var(--spacing-3) var(--spacing-4);
   font-size: var(--font-size-lg);
-  color: #A32D2D;
+  color: var(--color-danger);
   margin-bottom: var(--spacing-4);
   display: none;
   animation: softFadeIn 0.4s var(--ease-spring) forwards;
@@ -327,7 +327,7 @@ main {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24px;
+  font-size: var(--font-size-4xl);
   flex-shrink: 0;
 }
 
@@ -387,7 +387,7 @@ main {
 }
 
 .skill-bar {
-  height: 7px;
+  height: var(--spacing-2);
   background: var(--color-border-light);
   border-radius: var(--radius-base);
   overflow: hidden;
@@ -556,7 +556,7 @@ main {
   font-size: var(--font-size-lg);
   font-weight: 700;
   margin-bottom: var(--spacing-5);
-  color: #444;
+  color: var(--color-text-secondary);
   letter-spacing: 0.2px;
 }
 
@@ -593,7 +593,7 @@ main {
   padding: var(--spacing-1) var(--spacing-2);
   border-radius: var(--radius-lg);
   background: var(--color-border-light);
-  color: #555;
+  color: var(--color-text-secondary);
   margin-right: var(--spacing-2);
   vertical-align: 1px;
   letter-spacing: 0.3px;
@@ -602,7 +602,7 @@ main {
 .options {
   display: flex;
   flex-direction: column;
-  gap: 7px;
+  gap: var(--spacing-2);
 }
 
 /* ============================================
@@ -673,12 +673,12 @@ main {
 .opt-btn.wrong {
   border-color: var(--color-danger);
   background: var(--color-danger-light);
-  color: #A32D2D;
+  color: var(--color-danger);
   font-weight: 600;
 }
 
 .opt-btn.wrong .opt-label {
-  color: #A32D2D;
+  color: var(--color-danger);
 }
 
 /* ============================================
@@ -707,7 +707,7 @@ main {
 .q-exp.no {
   background: var(--color-danger-light);
   border-left: var(--border-width-lg) solid var(--color-danger);
-  color: #A32D2D;
+  color: var(--color-danger);
 }
 
 .q-exp-title {
@@ -829,14 +829,12 @@ main {
   transform: scale(0.96);
   box-shadow: none;
 }
-
 /* ============================================
    載入動畫
    ============================================ */
 .loading-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(247, 247, 245, var(--loading-overlay-opacity));
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -844,6 +842,17 @@ main {
   z-index: var(--z-loading);
   gap: var(--spacing-4);
   animation: softFadeIn 0.3s ease-out forwards;
+  /* 移除原本的 background: color-mix(...) */
+}
+
+/* 透過虛擬元素來做半透明背景，完美支援所有主題與瀏覽器 */
+.loading-overlay::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--color-bg);               /* 自動吃當下主題的背景色 */
+  opacity: var(--loading-overlay-opacity);   /* 原有的 0.94 或 0.92 變數 */
+  z-index: -1;                               /* 確保背景墊在 Spinner 與文字下方 */
 }
 
 .spinner {
@@ -863,28 +872,27 @@ main {
 
 .loading-sub {
   font-size: var(--font-size-base);
-  color: #aaa;
+  color: var(--color-text-light);
 }
-
 /* ============================================
    主題切換按鈕
    ============================================ */
 .theme-toggle {
   display: flex;
   align-items: center;
-  gap: 8px;                      /* 圖示與文字間距拉大 */
+  gap: var(--spacing-2);
   background: none;
   border: none;
-  padding: var(--spacing-2) var(--spacing-4);  /* 上下 8px，左右 16px，增加點擊區域 */
+  padding: var(--spacing-2) var(--spacing-4);
   border-radius: var(--radius-md);
   color: var(--color-text-secondary);
   cursor: pointer;
   font-family: inherit;
-  font-size: var(--font-size-lg);  /* 從 sm 改為 lg（約 14px） */
+  font-size: var(--font-size-lg);
   font-weight: 500;
   transition: background var(--transition-fast), color var(--transition-fast);
-  min-height: 44px;               /* 確保高度舒適 */
-  min-width: 100px;               /* 預留足夠寬度 */
+  min-height: 44px;
+  min-width: 100px;
 }
 
 .theme-toggle:hover {
@@ -958,7 +966,7 @@ main {
 
 .theme-dropdown {
   position: absolute;
-  top: calc(100% + 4px);
+  top: calc(100% + var(--spacing-1));
   right: 0;
   background: var(--color-bg-white);
   border: var(--border-width-sm) solid var(--color-border);
@@ -996,300 +1004,6 @@ main {
   background: var(--color-primary-light);
   color: var(--color-primary);
   font-weight: 600;
-}
-/* ============================================
-   聽力控制 (Listening Controls)
-   ============================================ */
-.listening-controls {
-  padding: var(--spacing-4) 0;
-}
-
-.listening-instruction {
-  font-size: var(--font-size-lg);
-  font-weight: 500;
-  color: var(--color-text-secondary);
-  margin-bottom: var(--spacing-4);
-  text-align: center;
-}
-
-.audio-controls {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-4);
-  flex-wrap: wrap;
-}
-
-.audio-btn {
-  padding: var(--spacing-3) var(--spacing-6);
-  border: none;
-  border-radius: var(--radius-lg);
-  font-size: var(--font-size-xl);
-  font-weight: 600;
-  cursor: pointer;
-  font-family: inherit;
-  transition: background var(--transition-fast), transform var(--transition-base);
-  min-width: 80px;
-}
-
-.audio-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.play-btn {
-  background: var(--color-primary);
-  color: var(--color-text-white);
-}
-
-.play-btn:hover:not(:disabled) {
-  background: var(--color-primary-hover);
-  transform: scale(1.02);
-}
-
-.stop-btn {
-  background: var(--color-danger);
-  color: var(--color-text-white);
-}
-
-.stop-btn:hover:not(:disabled) {
-  background: #C0392B;
-  transform: scale(1.02);
-}
-
-.audio-status {
-  font-size: var(--font-size-md);
-  color: var(--color-text-secondary);
-  min-width: 100px;
-}
-
-.tag-listening {
-  background: #FFE4B5;
-  color: #8B6B3D;
-}
-/* ============================================
-   填空測驗 (Fill-in-the-Blank)
-   ============================================ */
-.fill-screen {
-  display: none;
-  animation: softFadeIn 0.5s var(--ease-spring) forwards;
-}
-
-.tag-fill {
-  background: #D1E7FF;
-  color: #1A5A9C;
-}
-
-[data-theme="dark"] .tag-fill {
-  background: #1A3A5A;
-  color: #93C5FD;
-}
-
-[data-theme="gray"] .tag-fill {
-  background: #D1D5DB;
-  color: #4B5563;
-}
-
-[data-theme="star"] .tag-fill {
-  background: #1E3A5F;
-  color: #93C5FD;
-}
-
-.fill-body {
-  font-size: var(--font-size-xl);
-  line-height: 2;
-  color: var(--color-text-secondary);
-}
-
-.blank-highlight {
-  display: inline-block;
-  background: var(--color-primary-light);
-  color: var(--color-primary);
-  font-weight: 700;
-  padding: 0 6px;
-  border-radius: var(--radius-sm);
-  border-bottom: 2px dashed var(--color-primary);
-  margin: 0 2px;
-}
-
-.fill-blanks-card {
-  background: var(--color-bg-white);
-  border-radius: var(--radius-2xl);
-  border: var(--border-width-sm) solid var(--color-border);
-  padding: var(--spacing-7) var(--spacing-7);
-  margin-bottom: var(--spacing-5);
-  transition: transform var(--transition-base), box-shadow var(--transition-base);
-}
-
-.fill-blanks-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-lg);
-}
-
-.fill-blanks-card h3 {
-  font-size: var(--font-size-lg);
-  font-weight: 700;
-  margin-bottom: var(--spacing-2);
-  color: #444;
-}
-
-.fill-instruction {
-  font-size: var(--font-size-md);
-  color: var(--color-text-secondary);
-  margin-bottom: var(--spacing-5);
-}
-
-.fill-item {
-  margin-bottom: var(--spacing-6);
-  padding-bottom: var(--spacing-6);
-  border-bottom: var(--border-width-sm) solid var(--color-border-light);
-}
-
-.fill-item:last-child {
-  margin-bottom: 0;
-  padding-bottom: 0;
-  border-bottom: none;
-}
-
-.fill-sentence {
-  font-size: var(--font-size-xl);
-  font-weight: 500;
-  line-height: 1.8;
-  margin-bottom: var(--spacing-3);
-  color: var(--color-text);
-}
-
-.fill-number {
-  color: var(--color-primary);
-  font-weight: 700;
-  margin-right: var(--spacing-2);
-}
-
-.blank-inline {
-  display: inline-block;
-  background: var(--color-primary-light);
-  color: var(--color-primary);
-  font-weight: 700;
-  padding: 0 8px;
-  border-radius: var(--radius-sm);
-  border-bottom: 2px dashed var(--color-primary);
-  min-width: 60px;
-  text-align: center;
-  margin: 0 2px;
-}
-
-.fill-hint {
-  font-size: var(--font-size-md);
-  color: var(--color-text-light);
-  margin-left: var(--spacing-2);
-  font-weight: 400;
-}
-
-.fill-options {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: var(--spacing-2);
-}
-
-.fill-opt-btn {
-  padding: var(--spacing-2) var(--spacing-4);
-  border: var(--border-width-md) solid var(--color-border);
-  border-radius: var(--radius-md);
-  background: var(--color-bg-white);
-  font-size: var(--font-size-md);
-  cursor: pointer;
-  font-family: inherit;
-  color: var(--color-text);
-  transition: border-color var(--transition-fast), background var(--transition-fast), transform var(--transition-fast);
-  flex: 1 0 auto;
-  max-width: 180px;
-  text-align: center;
-}
-
-.fill-opt-btn:hover:not(:disabled) {
-  border-color: var(--color-primary);
-  background: var(--color-primary-light);
-  transform: translateY(-2px);
-}
-
-.fill-opt-btn.selected {
-  border-color: var(--color-primary);
-  background: var(--color-primary-light);
-  font-weight: 600;
-  color: var(--color-primary);
-}
-
-.fill-opt-btn.correct {
-  border-color: var(--color-success);
-  background: var(--color-success-light);
-  color: var(--color-success);
-  font-weight: 600;
-}
-
-.fill-opt-btn.wrong {
-  border-color: var(--color-danger);
-  background: var(--color-danger-light);
-  color: #A32D2D;
-  font-weight: 600;
-}
-
-.fill-opt-btn:disabled {
-  cursor: not-allowed;
-}
-
-.fill-result {
-  margin-top: var(--spacing-2);
-  font-size: var(--font-size-md);
-  font-weight: 500;
-}
-
-.fill-correct {
-  color: var(--color-success);
-}
-
-.fill-wrong {
-  color: var(--color-danger);
-}
-
-/* 暗色模式調整 */
-[data-theme="dark"] .fill-blanks-card h3 {
-  color: #9CA3AF;
-}
-
-[data-theme="dark"] .blank-highlight,
-[data-theme="dark"] .blank-inline {
-  background: var(--color-primary-light);
-  color: var(--color-primary);
-}
-
-[data-theme="dark"] .fill-opt-btn {
-  border-color: var(--color-border);
-  background: var(--color-bg-white);
-  color: var(--color-text);
-}
-
-[data-theme="dark"] .fill-opt-btn:hover:not(:disabled) {
-  border-color: var(--color-primary);
-  background: var(--color-primary-light);
-}
-
-[data-theme="dark"] .fill-opt-btn.selected {
-  border-color: var(--color-primary);
-  background: var(--color-primary-light);
-  color: var(--color-primary);
-}
-
-[data-theme="dark"] .fill-opt-btn.correct {
-  border-color: var(--color-success);
-  background: var(--color-success-light);
-  color: var(--color-success);
-}
-
-[data-theme="dark"] .fill-opt-btn.wrong {
-  border-color: var(--color-danger);
-  background: var(--color-danger-light);
-  color: #FCA5A5;
 }
 /* ============================================
    響應式設計

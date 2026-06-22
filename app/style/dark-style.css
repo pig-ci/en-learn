@@ -30,16 +30,16 @@
 
 /* 暗色模式下的額外調整 */
 [data-theme="dark"] .questions-card h3 {
-  color: #9CA3AF;
+  color: var(--color-text-secondary);
 }
 
 [data-theme="dark"] .q-type-badge {
-  background: #374151;
-  color: #9CA3AF;
+  background: var(--color-border);
+  color: var(--color-text-secondary);
 }
 
 [data-theme="dark"] .error-box {
-  border-color: #7F1D1D;
+  border-color: var(--color-danger);
 }
 
 [data-theme="dark"] .btn-back2 {
@@ -49,19 +49,15 @@
 }
 
 [data-theme="dark"] .btn-back2:hover {
-  background: #374151;
+  background: var(--color-border);
 }
 
 [data-theme="dark"] .level-icon {
-  background: #1A3A5A;
-}
-
-[data-theme="dark"] .loading-overlay {
-  background: rgba(17, 24, 39, 0.94);
+  background: var(--color-primary-light);
 }
 
 [data-theme="dark"] .spinner {
-  border-color: #1A3A5A;
+  border-color: var(--color-primary-light);
   border-top-color: var(--color-primary);
 }
 
@@ -100,7 +96,7 @@
 [data-theme="dark"] .opt-btn.wrong {
   border-color: var(--color-danger);
   background: var(--color-danger-light);
-  color: #FCA5A5;
+  color: var(--color-danger);
 }
 
 [data-theme="dark"] .opt-label {
@@ -128,7 +124,7 @@
 [data-theme="dark"] .q-exp.no {
   background: var(--color-danger-light);
   border-left-color: var(--color-danger);
-  color: #FCA5A5;
+  color: var(--color-danger);
 }
 
 [data-theme="dark"] .skill-bar {
@@ -190,9 +186,4 @@
 [data-theme="dark"] .theme-option.active {
   background: var(--color-primary-light);
   color: var(--color-primary);
-}
-/* 暗色模式適配 */
-[data-theme="dark"] .tag-listening {
-  background: #3D3A1A;
-  color: #FBBF24;
 }
