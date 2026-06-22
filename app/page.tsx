@@ -269,7 +269,7 @@ export default function Home() {
               className={`tab-btn ${activeTab === "fill" ? "active" : ""}`}
               onClick={() => switchTab("fill")}
             >
-              填詞測驗
+              填空測驗
             </button>
           </div>
           <div className="nav-actions">
